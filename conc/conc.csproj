@@ -42,7 +42,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
+    <Compile Include="game\GameManager.cs" />
+    <Compile Include="game\GameSettings.cs" />
+    <Compile Include="game\scenes\base\Camera.cs" />
+    <Compile Include="game\scenes\base\Scene.cs" />
+    <Compile Include="game\scenes\GameScene.cs" />
+    <Compile Include="game\util\GameDebug.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -58,7 +64,7 @@
     <EmbeddedResource Include="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="Content\Content.mgcb" />
+    <MonoGameContentReference Include="content\Content.mgcb" />
     <None Include="app.manifest" />
     <None Include="libopenal.1.dylib" />
     <None Include="libSDL2-2.0.0.dylib" />
