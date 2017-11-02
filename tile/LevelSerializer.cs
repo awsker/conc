@@ -32,9 +32,11 @@ namespace tile
             }
         }
 
-        public static ILevel DeSerialize()
+        public static IList<ILevel> DeSerialize()
         {
-            var path = Path.GetFullPath(@"..\..\..\..\tiledgenerator\content\output");
+            var levels = new List<ILevel>();
+            var start = Directory.GetCurrentDirectory();
+            var path = Path.GetFullPath(@"..\..\..\..\..\tiledgenerator\content\output\");
             foreach (var fileName in Directory.GetFiles(path))
             {
                 if (!fileName.EndsWith(".bg"))
@@ -49,13 +51,13 @@ namespace tile
 
                         var serializer = new DataContractSerializer(typeof(Level), null, int.MaxValue, false, false, null, new LevelDataContractResolver());
                         using (var stream = new MemoryStream(bytes))
-                            using (var reader = XmlDictionaryReader.CreateBinaryReader(stream, XmlDictionaryReaderQuotas.Max))
-                                return (ILevel) serializer.ReadObject(reader);
+                        using (var reader = XmlDictionaryReader.CreateBinaryReader(stream, XmlDictionaryReaderQuotas.Max))
+                            levels.Add((ILevel) serializer.ReadObject(reader));
                     }
                 }
             }
 
-            return null;
+            return levels;
         }
     }
 
