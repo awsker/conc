@@ -1,18 +1,22 @@
 ﻿using System.Collections.Generic;
 using conc.game.scenes;
-using conc.game.scenes.@base;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using tile;
+using conc.game.input;
+using System;
+using conc.game.scenes.@base;
 
 namespace conc.game
 {
     public interface IGameManager
     {
         GraphicsDevice GraphicsDevice { get; }
+        T Get<T>();
+        void SetScene(IScene scene);
     }
 
     public class GameManager : DrawableGameComponent, IGameManager
@@ -20,9 +24,10 @@ namespace conc.game
         private readonly Game _game;
         private readonly ContentManager _contentManager;
         private SpriteBatch _spriteBatch;
-        private ISpriteBank _spriteBank;
+        private InputManager _inputManager;
 
-        private IGameScene _scene;
+        private IScene _scene;
+        private IScene _nextScene;
 
         private SpriteFont _debugFont;
 
@@ -32,24 +37,29 @@ namespace conc.game
         {
             _game = game;
             _contentManager = new ContentManager(game.Services, "content");
+            _inputManager = new InputManager(numPlayers: 1);
         }
 
         protected override void LoadContent()
         {
-            _spriteBank = new SpriteBank(_contentManager);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _levels = LevelSerializer.DeSerialize();
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
 
-            _scene = new GameScene(GraphicsDevice, _spriteBank);
-            _scene.LoadContent(_contentManager);
-            _scene.SetLevel(_levels[0]);
+            var gamescene = new GameScene();
+            SetScene(gamescene);
+
+            gamescene.SetLevel(_levels[0]);
         }
 
         public override void Update(GameTime gameTime)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 _game.Exit();
+                return;
+            }
+            changeSceneIfRequested();
 
             _scene.Update(gameTime);
         }
@@ -69,7 +79,32 @@ namespace conc.game
             }
             GameDebug.Messages.Clear();
 
-            _spriteBatch.End();
+            _spriteBatch.End();            
+        }
+
+        public T Get<T>()
+        {
+            var t = typeof(T);
+            if (_inputManager is T)
+                return (T)Convert.ChangeType(_inputManager, typeof(T));
+            else if(_contentManager is T)
+                return (T)Convert.ChangeType(_contentManager, typeof(T));
+            throw new Exception("No manager found");
+        }
+
+        public void SetScene(IScene scene)
+        {
+            _nextScene = scene;
+            _nextScene.SetGameManager(this);
+        }
+
+        private void changeSceneIfRequested()
+        {
+            if (_nextScene != null)
+            {
+                _scene = _nextScene;
+                _nextScene = null;
+            }
         }
     }
 }

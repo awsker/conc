@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using conc.game.scenes.@base;
-using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,16 +16,18 @@ namespace conc.game.scenes
     {
         private ILevel _level;
         private Texture2D _tileset;
-        private readonly ISpriteBank _spriteBank;
         private ICamera _camera;
+        private ContentManager _contentManager;
+        private IGameManager _gameManager;
 
-        public GameScene(GraphicsDevice graphicsDevice, ISpriteBank spriteBank) : base(graphicsDevice)
+        public GameScene() : base()
         {
-            _spriteBank = spriteBank;
         }
 
-        public override void LoadContent(ContentManager contentManager)
+        public override void SetGameManager(IGameManager gameManager)
         {
+            _gameManager = gameManager;
+            _contentManager = gameManager.Get<ContentManager>();
         }
 
         public override void Update(GameTime gameTime)
@@ -36,9 +37,7 @@ namespace conc.game.scenes
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-
             spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, _camera.Transform);
-            //spriteBatch.Begin();
 
             for (var y = 0; y < _level.Width; y++)
             {
@@ -61,7 +60,7 @@ namespace conc.game.scenes
             _level = level;
             
             var tilesetPath = Path.GetFullPath(@"..\..\..\..\content\tiledgenerator\content\");
-            _tileset = _spriteBank.Get(tilesetPath + _level.Tileset);
+            _tileset = _contentManager.Load<Texture2D>(tilesetPath + _level.Tileset);
 
             _camera = new Camera(_level);
         }
