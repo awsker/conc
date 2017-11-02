@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "conc", "conc\conc.csproj", "{00DC82C0-26F9-43FF-BEFC-3D7EF263F008}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tile", "tile\tile.csproj", "{2CB1CAB4-4A28-4243-81A0-242E6A3A0D82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tiledgenerator", "tiledgenerator\tiledgenerator.csproj", "{8EF90334-968C-4F1A-983F-4284EE67F723}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{00DC82C0-26F9-43FF-BEFC-3D7EF263F008}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00DC82C0-26F9-43FF-BEFC-3D7EF263F008}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00DC82C0-26F9-43FF-BEFC-3D7EF263F008}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CB1CAB4-4A28-4243-81A0-242E6A3A0D82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CB1CAB4-4A28-4243-81A0-242E6A3A0D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CB1CAB4-4A28-4243-81A0-242E6A3A0D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CB1CAB4-4A28-4243-81A0-242E6A3A0D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EF90334-968C-4F1A-983F-4284EE67F723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EF90334-968C-4F1A-983F-4284EE67F723}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EF90334-968C-4F1A-983F-4284EE67F723}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EF90334-968C-4F1A-983F-4284EE67F723}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
