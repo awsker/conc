@@ -1,4 +1,5 @@
-﻿using conc.game.scenes;
+﻿using conc.game.input;
+using conc.game.scenes;
 using conc.game.scenes.@base;
 using conc.game.util;
 using Microsoft.Xna.Framework;
@@ -18,6 +19,7 @@ namespace conc.game
         private readonly Game _game;
         private readonly ContentManager _contentManager;
         private SpriteBatch _spriteBatch;
+        private InputManager _inputManager;
 
         private IScene _scene;
 
@@ -27,6 +29,7 @@ namespace conc.game
         {
             _game = game;
             _contentManager = new ContentManager(game.Services, "content");
+            _inputManager = new InputManager(1);
         }
 
         protected override void LoadContent()
@@ -40,8 +43,11 @@ namespace conc.game
         public override void Update(GameTime gameTime)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 _game.Exit();
-
+                return;
+            }
+            _inputManager.Update();
             _scene.Update(gameTime);
         }
 

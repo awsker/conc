@@ -1,4 +1,5 @@
 ﻿using conc.game;
+using conc.game.util;
 using Microsoft.Xna.Framework;
 
 namespace conc
@@ -18,7 +19,7 @@ namespace conc
                 SynchronizeWithVerticalRetrace = true,
                 PreferMultiSampling = false
             };
-
+            VideoModeHelper.Initialize(deviceManager);
             var gameManager = new GameManager(this);
             Components.Add(gameManager);
         }
