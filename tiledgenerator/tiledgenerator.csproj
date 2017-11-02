@@ -56,79 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Content\Output\Stage0.bg" />
-    <None Include="Content\Output\Stage1.bg" />
-    <None Include="Content\Output\Stage10.bg" />
-    <None Include="Content\Output\Stage11.bg" />
-    <None Include="Content\Output\Stage12.bg" />
-    <None Include="Content\Output\Stage13.bg" />
-    <None Include="Content\Output\Stage14.bg" />
-    <None Include="Content\Output\Stage15.bg" />
-    <None Include="Content\Output\Stage2.bg" />
-    <None Include="Content\Output\Stage3.bg" />
-    <None Include="Content\Output\Stage4.bg" />
-    <None Include="Content\Output\Stage5.bg" />
-    <None Include="Content\Output\Stage6.bg" />
-    <None Include="Content\Output\Stage7.bg" />
-    <None Include="Content\Output\Stage8.bg" />
-    <None Include="Content\Output\Stage9.bg" />
-    <None Include="Content\Stage00_01.tmx" />
-    <None Include="Content\Stage01_01.tmx" />
-    <None Include="Content\Stage01_02.tmx" />
-    <None Include="Content\Stage01_03.tmx" />
-    <None Include="Content\Stage02_01.tmx" />
-    <None Include="Content\Stage02_02.tmx" />
-    <None Include="Content\Stage02_03.tmx" />
-    <None Include="Content\Stage03_01.tmx" />
-    <None Include="Content\Stage03_02.tmx" />
-    <None Include="Content\Stage03_03.tmx" />
-    <None Include="Content\Stage04_01.tmx" />
-    <None Include="Content\Stage04_02.tmx" />
-    <None Include="Content\Stage04_03.tmx" />
-    <None Include="Content\Stage05_01.tmx" />
-    <None Include="Content\Stage05_02.tmx" />
-    <None Include="Content\Stage05_03.tmx" />
-    <None Include="Content\Stage06_01.tmx" />
-    <None Include="Content\Stage06_02.tmx" />
-    <None Include="Content\Stage06_03.tmx" />
-    <None Include="Content\Stage07_01.tmx" />
-    <None Include="Content\Stage07_02.tmx" />
-    <None Include="Content\Stage08_01.tmx" />
-    <None Include="Content\Stage08_02.tmx" />
-    <None Include="Content\Stage09_01.tmx" />
-    <None Include="Content\Stage09_02.tmx" />
-    <None Include="Content\Stage10_01.tmx" />
-    <None Include="Content\Stage10_02.tmx" />
-    <None Include="Content\Stage11_01.tmx" />
-    <None Include="Content\Stage11_02.tmx" />
-    <None Include="Content\Stage12_01.tmx" />
-    <None Include="Content\Stage12_02.tmx" />
-    <None Include="Content\Stage13_01.tmx" />
-    <None Include="Content\Stage13_02.tmx" />
-    <None Include="Content\Stage14_01.tmx" />
-    <None Include="Content\Stage14_02.tmx" />
-    <None Include="Content\Stage15_01.tmx" />
-    <None Include="Content\Stage15_02.tmx" />
+    <None Include="content\level_001.tmx" />
+    <None Include="content\output\level_001.bg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Stage00.png" />
-    <Content Include="Content\Stage01.png" />
-    <Content Include="Content\Stage02.png" />
-    <Content Include="Content\Stage03.png" />
-    <Content Include="Content\Stage04.png" />
-    <Content Include="Content\Stage05.png" />
-    <Content Include="Content\Stage06.png" />
-    <Content Include="Content\Stage07.png" />
-    <Content Include="Content\Stage08.png" />
-    <Content Include="Content\Stage09.png" />
-    <Content Include="Content\Stage10.png" />
-    <Content Include="Content\Stage11.png" />
-    <Content Include="Content\Stage12.png" />
-    <Content Include="Content\Stage13.png" />
-    <Content Include="Content\Stage14.png" />
-    <Content Include="Content\Stage15.png" />
+    <Content Include="content\level_001.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
