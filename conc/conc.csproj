@@ -53,6 +53,7 @@
     <Compile Include="game\scenes\base\Scene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
     <Compile Include="game\util\GameDebug.cs" />
+    <Compile Include="game\util\SpriteBank.cs" />
     <Compile Include="game\util\VideoModeHelper.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
@@ -110,6 +111,12 @@
     <Content Include="x86\soft_oal.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\tile\tile.csproj">
+      <Project>{2CB1CAB4-4A28-4243-81A0-242E6A3A0D82}</Project>
+      <Name>tile</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
