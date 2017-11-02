@@ -1,10 +1,12 @@
-﻿using conc.game.scenes;
+﻿using System.Collections.Generic;
+using conc.game.scenes;
 using conc.game.scenes.@base;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using tile;
 
 namespace conc.game
 {
@@ -18,11 +20,14 @@ namespace conc.game
         private readonly Game _game;
         private readonly ContentManager _contentManager;
         private SpriteBatch _spriteBatch;
+        private ISpriteBank _spriteBank;
 
-        private IScene _scene;
+        private IGameScene _scene;
 
         private SpriteFont _debugFont;
 
+        private IList<ILevel> _levels;
+        
         public GameManager(Game game) : base(game)
         {
             _game = game;
@@ -31,10 +36,14 @@ namespace conc.game
 
         protected override void LoadContent()
         {
+            _spriteBank = new SpriteBank(_contentManager);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _scene = new GameScene(GraphicsDevice);
-            _scene.LoadContent(_contentManager);
+            _levels = LevelSerializer.DeSerialize();
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
+
+            _scene = new GameScene(GraphicsDevice, _spriteBank);
+            _scene.LoadContent(_contentManager);
+            _scene.SetLevel(_levels[0]);
         }
 
         public override void Update(GameTime gameTime)

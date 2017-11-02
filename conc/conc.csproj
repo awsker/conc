@@ -48,6 +48,7 @@
     <Compile Include="game\scenes\base\Scene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
     <Compile Include="game\util\GameDebug.cs" />
+    <Compile Include="game\util\SpriteBank.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -58,6 +59,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
+    <Reference Include="tile">
+      <HintPath>..\tile\bin\Debug\tile.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
