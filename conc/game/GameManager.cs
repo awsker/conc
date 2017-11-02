@@ -56,11 +56,11 @@ namespace conc.game
 
         public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin();
-
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _scene.Draw(_spriteBatch);
+
+            _spriteBatch.Begin();
 
             for (var i = 0; i < GameDebug.Messages.Count; i++)
             {

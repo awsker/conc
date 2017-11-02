@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using tile;
 
 namespace conc.game.scenes.@base
 {
@@ -13,17 +15,16 @@ namespace conc.game.scenes.@base
         Vector2 ScreenCenter { get; }
         Matrix Transform { get; }
 
-        int LevelWidth { get; set; }
-        int LevelHeight { get; set; }
+        int LevelWidth { get; }
+        int LevelHeight { get; }
 
         void Update(GameTime gameTime);
         void Draw(SpriteBatch sb);
 
-        void Initialize();
         void SetPosition(Vector2 position);
     }
 
-    public class Camera : GameComponent, ICamera
+    public class Camera : ICamera
     {
         private Vector2 _position;
         private float _viewportHeight;
@@ -32,9 +33,22 @@ namespace conc.game.scenes.@base
         private readonly float _defaultViewportX = GameSettings.TargetWidth;
         private readonly float _defaultViewportY = GameSettings.TargetHeight;
 
-        public Camera(Game game) : base(game)
+        public Camera(ILevel level)
         {
             _position = new Vector2(0, 0);
+            LevelWidth = level.Width * GameSettings.TileSize;
+            LevelHeight = level.Height * GameSettings.TileSize;
+
+            _viewportWidth = GameSettings.PreferredBackBufferWidth;
+            _viewportHeight = GameSettings.PreferredBackBufferHeight;
+
+            ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
+
+            var scaleX = _viewportWidth / _defaultViewportX;
+            var scaleY = _viewportHeight / _defaultViewportY;
+
+            Scale = new Vector2(scaleX, scaleY);
+            Velocity = 1f;
         }
 
         public Vector2 Position
@@ -42,8 +56,8 @@ namespace conc.game.scenes.@base
             get => _position;
             set
             {
-                value.X = MathHelper.Clamp(_position.X, _viewportWidth / 2f / Scale.X, MapWidth - _viewportWidth / 2f / Scale.Y);
-                value.Y = MathHelper.Clamp(_position.Y, _viewportHeight / 2f / Scale.X, MapHeight - _viewportHeight / 2f / Scale.Y);
+                value.X = MathHelper.Clamp(_position.X, _viewportWidth / 2f / Scale.X, LevelWidth - _viewportWidth / 2f / Scale.Y);
+                value.Y = MathHelper.Clamp(_position.Y, _viewportHeight / 2f / Scale.X, LevelHeight - _viewportHeight / 2f / Scale.Y);
 
                 _position = value;
             }
@@ -54,30 +68,12 @@ namespace conc.game.scenes.@base
         public Vector2 Scale { get; set; }
         public Vector2 ScreenCenter { get; protected set; }
         public Matrix Transform { get; set; }
-        public int LevelWidth { get; set; }
-        public int LevelHeight { get; set; }
+        public int LevelWidth { get; }
+        public int LevelHeight { get; }
         public float Velocity { get; set; }
-        public int MapWidth { get; set; }
-        public int MapHeight { get; set; }
 
         public void Draw(SpriteBatch sb)
         {
-        }
-
-        public override void Initialize()
-        {
-            _viewportWidth = Game.GraphicsDevice.Viewport.Width;
-            _viewportHeight = Game.GraphicsDevice.Viewport.Height;
-
-            ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
-
-            var scaleX = _viewportWidth / _defaultViewportX;
-            var scaleY = _viewportHeight / _defaultViewportY;
-
-            Scale = new Vector2(scaleX, scaleY);
-            Velocity = 100f;
-
-            base.Initialize();
         }
 
         public void SetPosition(Vector2 position)
@@ -86,8 +82,17 @@ namespace conc.game.scenes.@base
             _position.Y = position.Y + _viewportHeight / 2f;
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                _position.Y -= (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                _position.Y += (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                _position.X -= (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                _position.X += (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+
             Transform = Matrix.Identity *
                         Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
                         Matrix.CreateRotationZ(Rotation) *
@@ -95,8 +100,6 @@ namespace conc.game.scenes.@base
                         Matrix.CreateScale(new Vector3(Scale.X, Scale.Y, 1f));
 
             Origin = ScreenCenter / Scale;
-
-            base.Update(gameTime);
         }
     }
 }
