@@ -4,6 +4,7 @@ using conc.game.entity;
 using conc.game.entity.@base;
 using conc.game.input;
 using conc.game.scenes.@base;
+using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +25,7 @@ namespace conc.game.scenes
         private ContentManager _contentManager;
         private IGameManager _gameManager;
         private InputManager _inputManager;
+        private VideoModeManager _videoManager;
         private IPlayer _player;
 
         private readonly IList<IEntity> _entities = new List<IEntity>();
@@ -33,6 +35,7 @@ namespace conc.game.scenes
             _gameManager = gameManager;
             _contentManager = gameManager.Get<ContentManager>();
             _inputManager = gameManager.Get<InputManager>();
+            _videoManager = gameManager.Get<VideoModeManager>();
         }
 
         public override void Update(GameTime gameTime)
@@ -55,7 +58,7 @@ namespace conc.game.scenes
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, _camera.Transform);
+            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.LinearClamp, null, null, null, _camera.Transform);
 
             for (var y = 0; y < _level.Width; y++)
             {
@@ -88,7 +91,7 @@ namespace conc.game.scenes
             _player.LoadContent(_contentManager);
             _entities.Add(_player);
 
-            _camera = new Camera(_level);
+            _camera = new Camera(_videoManager.GraphicsDeviceManager);
             _camera.SetTarget(_player);
         }
     }

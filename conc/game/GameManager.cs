@@ -38,6 +38,7 @@ namespace conc.game
         public GameManager(Game game) : base(game)
         {
             _game = game;
+            _game.IsFixedTimeStep = false;
             _contentManager = new ContentManager(game.Services, "content");
             _inputManager = new InputManager(numPlayers: 1);
             initVideoManager();
@@ -60,9 +61,8 @@ namespace conc.game
             {
                 PreferredBackBufferWidth = GameSettings.PreferredBackBufferWidth,
                 PreferredBackBufferHeight = GameSettings.PreferredBackBufferHeight,
-                //IsFullScreen = true,
                 SynchronizeWithVerticalRetrace = true,
-                PreferMultiSampling = false                
+                PreferMultiSampling = false
             };
             _videoManager = new VideoModeManager(deviceManager, _game.Window);
         }
@@ -135,6 +135,7 @@ namespace conc.game
 
             _spriteBatch.Begin();
 
+            GameDebug.Messages.Add("Frame rate: " + 1 / gameTime.ElapsedGameTime.TotalSeconds);
             for (var i = 0; i < GameDebug.Messages.Count; i++)
             {
                 var message = GameDebug.Messages[i];

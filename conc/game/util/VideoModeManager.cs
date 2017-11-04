@@ -12,6 +12,7 @@ namespace conc.game.util
         private int _widthBeforeFullscreen;
         private int _heightBeforeFullscreen;
 
+        public GraphicsDeviceManager GraphicsDeviceManager => _manager;
         public VideoModeManager(GraphicsDeviceManager manager, GameWindow window)
         {
             _manager = manager;
