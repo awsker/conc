@@ -53,7 +53,7 @@
     <Compile Include="game\scenes\base\Scene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
     <Compile Include="game\util\GameDebug.cs" />
-    <Compile Include="game\util\VideoModeHelper.cs" />
+    <Compile Include="game\util\VideoModeManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

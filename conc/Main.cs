@@ -1,5 +1,4 @@
 ﻿using conc.game;
-using conc.game.util;
 using Microsoft.Xna.Framework;
 
 namespace conc
@@ -11,15 +10,6 @@ namespace conc
     {
         public Main()
         {
-            var deviceManager = new GraphicsDeviceManager(this)
-            {
-                PreferredBackBufferWidth = GameSettings.PreferredBackBufferWidth,
-                PreferredBackBufferHeight = GameSettings.PreferredBackBufferHeight,
-                //IsFullScreen = true,
-                SynchronizeWithVerticalRetrace = true,
-                PreferMultiSampling = false
-            };
-            VideoModeHelper.Initialize(deviceManager);
             var gameManager = new GameManager(this);
             Components.Add(gameManager);
         }
