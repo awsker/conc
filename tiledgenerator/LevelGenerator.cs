@@ -129,7 +129,7 @@ namespace BGStageGenerator
 
         private void CreateObjects(ILevel data, XmlDocument doc, int tilewidth, int tileheight)
         {
-            var objectGroup = doc?.DocumentElement?.SelectSingleNode("objectgroup[@name='Objects']");
+            var objectGroup = doc?.DocumentElement?.SelectSingleNode("objectgroup[@name='objects']");
             if (objectGroup == null)
                 return;
 
@@ -157,27 +157,9 @@ namespace BGStageGenerator
 
                         if (name == "start")
                         {
-                            var posX = x + width / 2f;
-                            var posY = y + height + 1.9f;
+                            var posX = x;
+                            var posY = y;
                             data.Start = new Vector2(posX, posY);
-                        }
-
-                        if (name == "ladder")
-                        {
-                            var type = CollisionType.Ladder;
-                            if (ny == 0 && nx == 0)
-                                type = CollisionType.LadderTop;
-                            if (ny == width / tilewidth - 1 && nx == height / tileheight - 1)
-                                type = CollisionType.LadderBottom;
-
-                            var collisionTile = new CollisionTile(new Rectangle(x + nx * tilewidth, y + ny * tileheight, tilewidth, tileheight), type);
-                            data.Collisions[x / tilewidth + nx, y / tileheight + ny] = collisionTile;
-                        }
-
-                        if (name == "platform")
-                        {
-                            var collisionTile = new CollisionTile(new Rectangle(x + nx * tilewidth, y + ny * tileheight, tilewidth, tileheight), CollisionType.Platform);
-                            data.Collisions[x / tilewidth + nx, y / tileheight + ny] = collisionTile;
                         }
                     }
                 }

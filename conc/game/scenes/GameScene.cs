@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using conc.game.entity;
+using conc.game.entity.@base;
 using conc.game.scenes.@base;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -20,9 +23,7 @@ namespace conc.game.scenes
         private ContentManager _contentManager;
         private IGameManager _gameManager;
 
-        public GameScene() : base()
-        {
-        }
+        private readonly IList<IEntity> _entities = new List<IEntity>();
 
         public override void SetGameManager(IGameManager gameManager)
         {
@@ -52,17 +53,26 @@ namespace conc.game.scenes
                 }
             }
 
+            foreach (var entity in _entities)
+                entity.Draw(spriteBatch);
+
             spriteBatch.End();
         }
 
         public void SetLevel(ILevel level)
         {
+            _entities.Clear();
             _level = level;
             
             var tilesetPath = Path.GetFullPath(@"..\..\..\..\content\tiledgenerator\content\");
             _tileset = _contentManager.Load<Texture2D>(tilesetPath + _level.Tileset);
 
+            var player = new Player(_level.Start);
+            player.LoadContent(_contentManager);
+            _entities.Add(player);
+
             _camera = new Camera(_level);
+            _camera.SetTarget(player);
         }
     }
 }

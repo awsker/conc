@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using conc.game.entity.@base;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using tile;
@@ -22,6 +23,7 @@ namespace conc.game.scenes.@base
         void Draw(SpriteBatch sb);
 
         void SetPosition(Vector2 position);
+        void SetTarget(IEntity target);
     }
 
     public class Camera : ICamera
@@ -32,6 +34,10 @@ namespace conc.game.scenes.@base
 
         private readonly float _defaultViewportX = GameSettings.TargetWidth;
         private readonly float _defaultViewportY = GameSettings.TargetHeight;
+        //private readonly float _defaultViewportX = GameSettings.PreferredBackBufferWidth;
+        //private readonly float _defaultViewportY = GameSettings.PreferredBackBufferHeight;
+
+        private IEntity _target;
 
         public Camera(ILevel level)
         {
@@ -56,8 +62,8 @@ namespace conc.game.scenes.@base
             get => _position;
             set
             {
-                value.X = MathHelper.Clamp(_position.X, _viewportWidth / 2f / Scale.X, LevelWidth - _viewportWidth / 2f / Scale.Y);
-                value.Y = MathHelper.Clamp(_position.Y, _viewportHeight / 2f / Scale.X, LevelHeight - _viewportHeight / 2f / Scale.Y);
+                //value.X = MathHelper.Clamp(_position.X, _viewportWidth / 2f / Scale.X, LevelWidth - _viewportWidth / 2f / Scale.Y);
+                //value.Y = MathHelper.Clamp(_position.Y, _viewportHeight / 2f / Scale.X, LevelHeight - _viewportHeight / 2f / Scale.Y);
 
                 _position = value;
             }
@@ -82,16 +88,28 @@ namespace conc.game.scenes.@base
             _position.Y = position.Y + _viewportHeight / 2f;
         }
 
+        public void SetTarget(IEntity target)
+        {
+            _target = target;
+        }
+
         public void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                _position.Y -= (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                _position.Y += (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                _position.X -= (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                _position.X += (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            //if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            //    _position.Y -= (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            //if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            //    _position.Y += (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            //if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            //    _position.X -= (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+            //if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            //    _position.X += (float) gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
+
+            if (_target != null)
+            {
+                //SetPosition(_target.Transform.Position);
+                _position.X += (_target.Transform.Position.X - Position.X) * (float)gameTime.ElapsedGameTime.TotalMilliseconds * .05f;
+                _position.Y += (_target.Transform.Position.Y - Position.Y) * (float)gameTime.ElapsedGameTime.TotalMilliseconds * .05f;
+            }
 
             Transform = Matrix.Identity *
                         Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *

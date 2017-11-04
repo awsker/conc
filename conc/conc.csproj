@@ -42,6 +42,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="game\entity\base\Entity.cs" />
+    <Compile Include="game\entity\base\Transform.cs" />
+    <Compile Include="game\entity\Player.cs" />
     <Compile Include="game\GameManager.cs" />
     <Compile Include="game\GameSettings.cs" />
     <Compile Include="game\input\ButtonsContainer.cs" />
