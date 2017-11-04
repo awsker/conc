@@ -2,6 +2,7 @@
 using System.IO;
 using conc.game.entity;
 using conc.game.entity.@base;
+using conc.game.input;
 using conc.game.scenes.@base;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -22,6 +23,8 @@ namespace conc.game.scenes
         private ICamera _camera;
         private ContentManager _contentManager;
         private IGameManager _gameManager;
+        private InputManager _inputManager;
+        private IPlayer _player;
 
         private readonly IList<IEntity> _entities = new List<IEntity>();
 
@@ -29,10 +32,24 @@ namespace conc.game.scenes
         {
             _gameManager = gameManager;
             _contentManager = gameManager.Get<ContentManager>();
+            _inputManager = gameManager.Get<InputManager>();
         }
 
         public override void Update(GameTime gameTime)
         {
+            var playerPosition = _player.Transform.Position;
+
+            if (_inputManager.IsDown(ControlButtons.Right, 0))
+                playerPosition.X += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+            if (_inputManager.IsDown(ControlButtons.Left, 0))
+                playerPosition.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+            if (_inputManager.IsDown(ControlButtons.Up, 0))
+                playerPosition.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+            if (_inputManager.IsDown(ControlButtons.Down, 0))
+                playerPosition.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+
+            _player.Transform.Position = playerPosition;
+
             _camera.Update(gameTime);
         }
 
@@ -67,12 +84,12 @@ namespace conc.game.scenes
             var tilesetPath = Path.GetFullPath(@"..\..\..\..\content\tiledgenerator\content\");
             _tileset = _contentManager.Load<Texture2D>(tilesetPath + _level.Tileset);
 
-            var player = new Player(_level.Start);
-            player.LoadContent(_contentManager);
-            _entities.Add(player);
+            _player = new Player(_level.Start);
+            _player.LoadContent(_contentManager);
+            _entities.Add(_player);
 
             _camera = new Camera(_level);
-            _camera.SetTarget(player);
+            _camera.SetTarget(_player);
         }
     }
 }

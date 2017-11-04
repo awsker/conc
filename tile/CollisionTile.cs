@@ -6,41 +6,37 @@ namespace tile
     public interface ICollisionTile
     {
         Rectangle Bounds { get; set; }
-        CollisionType Type { get; set; }
+        Slope Slope { get; set; }
     }
 
     [DataContract(Name = "CollisionTile")]
     public class CollisionTile : ICollisionTile
     {
-        public CollisionTile(Rectangle bounds, CollisionType type)
+        public CollisionTile(Rectangle bounds, Slope type)
         {
             Bounds = bounds;
-            Type = type;
+            Slope = type;
         }
 
         [DataMember]
         public Rectangle Bounds { get; set; }
 
         [DataMember]
-        public CollisionType Type { get; set; }
+        public Slope Slope { get; set; }
     }
 
     [DataContract]
-    public enum CollisionType
+    public enum Slope
     {
         [EnumMember]
         None,
         [EnumMember]
-        Solid,
+        FloorDown,
         [EnumMember]
-        Edge,
+        FloorUp,
         [EnumMember]
-        Platform,
+        RoofDown,
         [EnumMember]
-        Ladder,
-        [EnumMember]
-        LadderTop,
-        [EnumMember]
-        LadderBottom
+        RoofUp
     }
 }

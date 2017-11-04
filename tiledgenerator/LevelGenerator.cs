@@ -46,6 +46,25 @@ namespace BGStageGenerator
                         var imageWidth = int.Parse(imageNode.Attributes["width"].Value);
                         var imageHeight = int.Parse(imageNode.Attributes["height"].Value);
 
+                        var tiles = tileNode.SelectNodes("tile");
+                        var slopeDict = new Dictionary<int, int>();
+                        if (tiles != null)
+                        {
+                            foreach (var tile in tiles)
+                            {
+                                var node = tile as XmlNode;
+                                var tileId = node.Attributes["id"].Value;
+                                var props = node.SelectSingleNode("properties");
+                                var slopePropery = props.SelectSingleNode("property");
+                                if (slopePropery.Attributes["name"].Value == "slope")
+                                {
+                                    var slopeValue = slopePropery.Attributes["value"].Value;
+                                    slopeDict.Add(int.Parse(tileId) + 1, int.Parse(slopeValue));
+                                }
+
+                            }
+                        }
+
                         var level = new Level
                         {
                             Tiles = new ITile[width, height],
@@ -57,7 +76,7 @@ namespace BGStageGenerator
 
                         //level.StartPoint = new List<ISpawnPoint>();
 
-                        CreateTiles(level, doc, imageWidth, tileWidth, tileHeight);
+                        CreateTiles(level, doc, imageWidth, tileWidth, tileHeight, slopeDict);
                         CreateObjects(level, doc, tileWidth, tileHeight);
 
                         level.Name = stageName;
@@ -71,7 +90,7 @@ namespace BGStageGenerator
             return levels;
         }
 
-        private void CreateTiles(ILevel data, XmlDocument doc, int tilesetWidth, int tilewidth, int tileheight)
+        private void CreateTiles(ILevel data, XmlDocument doc, int tilesetWidth, int tilewidth, int tileheight, Dictionary<int, int> slopeDict)
         {
             var width = int.Parse(doc.DocumentElement.GetAttribute("width"));
 
@@ -92,7 +111,21 @@ namespace BGStageGenerator
                     var row = (gid - 1) / tilesetCols;
 
                     data.Tiles[x, y] = new Tile(x, y, new Rectangle(col*tilewidth, row*tileheight, tilewidth, tileheight));
-                    data.Collisions[x, y] = new CollisionTile(new Rectangle(x * tilewidth, y * tileheight, tilewidth, tileheight), CollisionType.Solid);
+
+                    var slope = Slope.None;
+                    if (slopeDict.TryGetValue(gid, out var slopeId))
+                    {
+                        if (slopeId == 0)
+                            slope = Slope.FloorDown;
+                        else if (slopeId == 1)
+                            slope = Slope.FloorUp;
+                        else if (slopeId == 2)
+                            slope = Slope.RoofDown;
+                        else if (slopeId == 3)
+                            slope = Slope.RoofUp;
+                    }
+
+                    data.Collisions[x, y] = new CollisionTile(new Rectangle(x * tilewidth, y * tileheight, tilewidth, tileheight), slope);
                 }
 
                 x++;
@@ -100,29 +133,6 @@ namespace BGStageGenerator
                 {
                     x = 0;
                     y++;
-                }
-            }
-
-            for (y = 1; y < data.Collisions.GetLength(1)-1; y++)
-            {
-                for (x = 1; x < data.Collisions.GetLength(0)-1; x++)
-                {
-                    var tile = data.Collisions[x, y];
-                    if (tile != null && tile.Type == CollisionType.Solid)
-                    {
-                        // bottom right edge of tile
-                        if (data.Collisions[x + 1, y] == null && data.Collisions[x, y + 1] == null && data.Collisions[x + 1, y + 1] == null)
-                            data.Collisions[x + 1, y + 1] = new CollisionTile(new Rectangle((x + 1)*tilewidth, (y + 1)*tileheight, tilewidth, tileheight), CollisionType.Edge);
-                        // bottom left edge of tile
-                        if (data.Collisions[x - 1, y] == null && data.Collisions[x, y + 1] == null && data.Collisions[x - 1, y + 1] == null)
-                            data.Collisions[x - 1, y + 1] = new CollisionTile(new Rectangle((x - 1) * tilewidth, (y + 1) * tileheight, tilewidth, tileheight), CollisionType.Edge);
-                        // top right edge of tile
-                        if (data.Collisions[x + 1, y] == null && data.Collisions[x, y - 1] == null && data.Collisions[x + 1, y - 1] == null)
-                            data.Collisions[x + 1, y - 1] = new CollisionTile(new Rectangle((x + 1) * tilewidth, (y - 1) * tileheight, tilewidth, tileheight), CollisionType.Edge);
-                        // top left edge of tile
-                        if (data.Collisions[x - 1, y] == null && data.Collisions[x, y - 1] == null && data.Collisions[x - 1, y - 1] == null)
-                            data.Collisions[x - 1, y - 1] = new CollisionTile(new Rectangle((x - 1) * tilewidth, (y - 1) * tileheight, tilewidth, tileheight), CollisionType.Edge);
-                    }
                 }
             }
         }
