@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace conc.game.entity.@base
+namespace conc.game.entity.baseclass
 {
     public class Transform
     {

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace conc.game.entity.@base
+namespace conc.game.entity.baseclass
 {
     public interface IEntity
     {

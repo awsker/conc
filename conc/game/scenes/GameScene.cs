@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using conc.game.entity;
-using conc.game.entity.@base;
+using conc.game.entity.baseclass;
 using conc.game.input;
 using conc.game.scenes.@base;
 using conc.game.util;
