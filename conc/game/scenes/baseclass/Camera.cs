@@ -1,10 +1,8 @@
 ﻿using conc.game.entity.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using tile;
 
-namespace conc.game.scenes.@base
+namespace conc.game.scenes.baseclass
 {
     public interface ICamera
     {

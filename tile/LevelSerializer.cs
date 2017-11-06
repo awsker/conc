@@ -35,7 +35,6 @@ namespace tile
         public static IList<ILevel> DeSerialize()
         {
             var levels = new List<ILevel>();
-            var start = Directory.GetCurrentDirectory();
             var path = Path.GetFullPath(@"..\..\..\..\..\tiledgenerator\content\output\");
             foreach (var fileName in Directory.GetFiles(path))
             {
@@ -81,6 +80,14 @@ namespace tile
                 return true;
             }
 
+            if (type == typeof(Tileset))
+            {
+                var dictionary = new XmlDictionary();
+                typeName = dictionary.Add("Tileset");
+                typeNamespace = dictionary.Add("tile");
+                return true;
+            }
+
             return knownTypeResolver.TryResolveType(type, declaredType, knownTypeResolver, out typeName, out typeNamespace);
         }
 
@@ -91,6 +98,9 @@ namespace tile
 
             if (typeName == "CollisionTile" && typeNamespace == "tile")
                 return typeof(CollisionTile);
+
+            if (typeName == "Tileset" && typeNamespace == "tile")
+                return typeof(Tileset);
 
             return knownTypeResolver.ResolveName(typeName, typeNamespace, declaredType, knownTypeResolver);
         }

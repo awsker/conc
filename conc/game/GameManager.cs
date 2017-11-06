@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using conc.game.scenes;
-using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using tile;
+using conc.game.scenes.baseclass;
+using conc.game.scenes;
+using conc.game.util;
 using conc.game.input;
+using tile;
 using System;
-using conc.game.scenes.@base;
 
 namespace conc.game
 {

@@ -52,10 +52,11 @@
     <Compile Include="game\input\InputManager.cs" />
     <Compile Include="game\input\KeyboardInput.cs" />
     <Compile Include="game\input\PlayerInput.cs" />
-    <Compile Include="game\scenes\base\Camera.cs" />
-    <Compile Include="game\scenes\base\Scene.cs" />
+    <Compile Include="game\scenes\baseclass\Camera.cs" />
+    <Compile Include="game\scenes\baseclass\Scene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
     <Compile Include="game\util\GameDebug.cs" />
+    <Compile Include="game\util\Vector2Extension.cs" />
     <Compile Include="game\util\VideoModeManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />
@@ -66,6 +67,7 @@
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

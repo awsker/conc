@@ -7,7 +7,7 @@ namespace tile
     public interface ILevel
     {
         string Name { get; set; }
-        string Tileset { get; set; }
+        ITileset[] Tilesets { get; set; }
         ITile[,] Tiles { get; set; }
         ITile[,] Background { get; set; }
         ITile[,] Foreground { get; set; }
@@ -26,10 +26,10 @@ namespace tile
     {
         [DataMember]
         public string Name { get; set; }
-
+        
         [DataMember]
-        public string Tileset { get; set; }
-
+        public ITileset[] Tilesets { get; set; }
+       
         [DataMember]
         public ITile[][] TilesForSerialize { get; set; }
         public ITile[,] Tiles { get; set; }
@@ -47,7 +47,7 @@ namespace tile
         public ICollisionTile[,] Collisions { get; set; }
         public Rectangle[,] CameraCollisions { get; set; }
 
-        [DataMember]
+//        [DataMember]
         public IList<Rectangle> Deaths { get; set; }
 
         [DataMember]

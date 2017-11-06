@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
+using System.Linq;
 using conc.game.entity;
-using conc.game.entity.baseclass;
 using conc.game.input;
-using conc.game.scenes.@base;
+using conc.game.scenes.baseclass;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -20,15 +19,13 @@ namespace conc.game.scenes
     public class GameScene : Scene, IGameScene
     {
         private ILevel _level;
-        private Texture2D _tileset;
+        private Texture2D[] _tilesetTextures;
         private ICamera _camera;
         private ContentManager _contentManager;
         private IGameManager _gameManager;
         private InputManager _inputManager;
         private VideoModeManager _videoManager;
         private IPlayer _player;
-
-        private readonly IList<IEntity> _entities = new List<IEntity>();
 
         public override void SetGameManager(IGameManager gameManager)
         {
@@ -45,11 +42,11 @@ namespace conc.game.scenes
             if (_inputManager.IsDown(ControlButtons.Right, 0))
                 playerPosition.X += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
             if (_inputManager.IsDown(ControlButtons.Left, 0))
-                playerPosition.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                playerPosition.X -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
             if (_inputManager.IsDown(ControlButtons.Up, 0))
-                playerPosition.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                playerPosition.Y -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
             if (_inputManager.IsDown(ControlButtons.Down, 0))
-                playerPosition.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                playerPosition.Y += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
 
             _player.Transform.Position = playerPosition;
 
@@ -58,8 +55,19 @@ namespace conc.game.scenes
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.LinearClamp, null, null, null, _camera.Transform);
+            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null,
+                _camera.Transform);
 
+            drawLevel(spriteBatch);
+
+            foreach (var entity in Entities.Where(e => e.IsVisible))
+                entity.Draw(spriteBatch);
+
+            spriteBatch.End();
+        }
+
+        private void drawLevel(SpriteBatch spriteBatch)
+        {
             for (var y = 0; y < _level.Width; y++)
             {
                 for (var x = 0; x < _level.Height; x++)
@@ -68,28 +76,31 @@ namespace conc.game.scenes
                         continue;
 
                     var tile = _level.Tiles[x, y];
+
                     if (tile != null)
-                        spriteBatch.Draw(_tileset, new Vector2(tile.X * GameSettings.TileSize, tile.Y * GameSettings.TileSize), tile.Source, Color.White);
+                    {
+                        var tileset = _level.Tilesets[tile.TilesetIndex];
+                        spriteBatch.Draw(_tilesetTextures[tile.TilesetIndex], new Vector2(tile.X * tileset.TileWidth, tile.Y * tileset.TileHeight), tile.Source, Color.White);
+                    }
                 }
             }
-
-            foreach (var entity in _entities)
-                entity.Draw(spriteBatch);
-
-            spriteBatch.End();
         }
 
         public void SetLevel(ILevel level)
         {
-            _entities.Clear();
+            Entities.Clear();
             _level = level;
             
             var tilesetPath = Path.GetFullPath(@"..\..\..\..\content\tiledgenerator\content\");
-            _tileset = _contentManager.Load<Texture2D>(tilesetPath + _level.Tileset);
-
+            _tilesetTextures = new Texture2D[_level.Tilesets.Length];
+            for (int i = 0; i < _level.Tilesets.Length; ++i)
+            {
+                var tileset = _level.Tilesets[i];
+                _tilesetTextures[i] = _contentManager.Load<Texture2D>(tilesetPath + tileset.Source);
+            }
             _player = new Player(_level.Start);
             _player.LoadContent(_contentManager);
-            _entities.Add(_player);
+            Entities.Add(_player);
 
             _camera = new Camera(_videoManager.GraphicsDeviceManager);
             _camera.SetTarget(_player);

@@ -7,6 +7,7 @@ namespace tile
     {
         Rectangle Bounds { get; set; }
         Slope Slope { get; set; }
+        bool IsPointInside(Point p);
     }
 
     [DataContract(Name = "CollisionTile")]
@@ -23,6 +24,40 @@ namespace tile
 
         [DataMember]
         public Slope Slope { get; set; }
+
+        public bool IsPointInside(Point p)
+        {
+            var insideSquare = p.X >= Bounds.X && p.X < Bounds.X + Bounds.Width &&
+                               p.Y >= Bounds.Y && p.Y < Bounds.Y + Bounds.Height;
+
+            if (!insideSquare)
+                return false;
+
+            if(Slope == Slope.None)
+                return true;
+
+            var rx = p.X - Bounds.X;
+            var ry = p.Y - Bounds.Y;
+            var ryi = Bounds.Height - 1 - ry;
+
+            if (Slope == Slope.FloorDown)
+            {
+                return rx <= ry;
+            }
+            if (Slope == Slope.FloorDown)
+            {
+                return rx <= ryi;
+            }
+            if (Slope == Slope.RoofDown)
+            {
+                return rx >= ry;
+            }
+            if (Slope == Slope.RoofDown)
+            {
+                return rx >= ryi;
+            }
+            return false;
+        }
     }
 
     [DataContract]

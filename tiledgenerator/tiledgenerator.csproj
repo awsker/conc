@@ -46,9 +46,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="tile">
-      <HintPath>..\tile\bin\Debug\tile.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -62,6 +59,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\level_001.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\tile\tile.csproj">
+      <Project>{2cb1cab4-4a28-4243-81a0-242e6a3a0d82}</Project>
+      <Name>tile</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

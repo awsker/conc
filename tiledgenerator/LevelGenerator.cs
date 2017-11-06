@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Deployment.Internal;
 using System.IO;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Xml;
-using Microsoft.Xna.Framework;
 using tile;
+using Microsoft.Xna.Framework;
 
 namespace BGStageGenerator
 {
@@ -17,161 +20,176 @@ namespace BGStageGenerator
         public IList<ILevel> Generate()
         {
             var levels = new List<ILevel>();
-
-            foreach (var file in Directory.GetFiles(@"..\..\content"))
+            foreach (var file in Directory.GetFiles(@"..\..\content\", "*.tmx"))
             {
-                if (!file.EndsWith(".tmx"))
-                    continue;
-
                 Console.WriteLine("Generating stage for file {0}", file);
-
-                using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read))
-                {
-                    var doc = new XmlDocument();
-                    doc.Load(stream);
-
-                    if (doc.DocumentElement != null)
-                    {
-                        var stageName = Path.GetFileNameWithoutExtension(file);
-
-                        var width = int.Parse(doc.DocumentElement.GetAttribute("width"));
-                        var height = int.Parse(doc.DocumentElement.GetAttribute("height"));
-
-                        var tileNode = doc.DocumentElement.SelectSingleNode("tileset");
-                        var tilesetName = tileNode.Attributes["name"].Value;
-                        var tileWidth = int.Parse(tileNode.Attributes["tilewidth"].Value);
-                        var tileHeight = int.Parse(tileNode.Attributes["tileheight"].Value);
-
-                        var imageNode = tileNode.SelectSingleNode("image");
-                        var imageWidth = int.Parse(imageNode.Attributes["width"].Value);
-                        var imageHeight = int.Parse(imageNode.Attributes["height"].Value);
-
-                        var tiles = tileNode.SelectNodes("tile");
-                        var slopeDict = new Dictionary<int, int>();
-                        if (tiles != null)
-                        {
-                            foreach (var tile in tiles)
-                            {
-                                var node = tile as XmlNode;
-                                var tileId = node.Attributes["id"].Value;
-                                var props = node.SelectSingleNode("properties");
-                                var slopePropery = props.SelectSingleNode("property");
-                                if (slopePropery.Attributes["name"].Value == "slope")
-                                {
-                                    var slopeValue = slopePropery.Attributes["value"].Value;
-                                    slopeDict.Add(int.Parse(tileId) + 1, int.Parse(slopeValue));
-                                }
-
-                            }
-                        }
-
-                        var level = new Level
-                        {
-                            Tiles = new ITile[width, height],
-                            Background = new ITile[width, height],
-                            Foreground = new ITile[width, height],
-                            Collisions = new ICollisionTile[width, height],
-                            Deaths = new List<Rectangle>()
-                        };
-
-                        //level.StartPoint = new List<ISpawnPoint>();
-
-                        CreateTiles(level, doc, imageWidth, tileWidth, tileHeight, slopeDict);
-                        CreateObjects(level, doc, tileWidth, tileHeight);
-
-                        level.Name = stageName;
-                        level.Tileset = tilesetName;
-
-                        levels.Add(level);
-                    }
-                }
+                var level = readLevelFromFile(file);
+                if (level != null)
+                    levels.Add(level);
             }
-
             return levels;
         }
 
-        private void CreateTiles(ILevel data, XmlDocument doc, int tilesetWidth, int tilewidth, int tileheight, Dictionary<int, int> slopeDict)
+        private ILevel readLevelFromFile(string file)
         {
-            var width = int.Parse(doc.DocumentElement.GetAttribute("width"));
-
-            var tileLayer = doc.DocumentElement.SelectSingleNode("layer[@name='tiles']");
-            var tiles = tileLayer.SelectSingleNode("data").SelectNodes("tile");
-
-            var tilesetCols = tilesetWidth / tilewidth;
-
-            var x = 0;
-            var y = 0;
-
-            for (int i = 0; i < tiles?.Count; i++)
+            using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read))
             {
-                var gid = int.Parse(tiles[i].Attributes["gid"].Value);
-                if (gid != 0)
+                var doc = new XmlDocument();
+                doc.Load(stream);
+
+                if (doc.DocumentElement != null)
                 {
-                    var col = (gid - 1) % tilesetCols;
-                    var row = (gid - 1) / tilesetCols;
+                    IList<ITileset> tileSets = readTilesets(doc);
+                    var stageName = Path.GetFileNameWithoutExtension(file);
 
-                    data.Tiles[x, y] = new Tile(x, y, new Rectangle(col*tilewidth, row*tileheight, tilewidth, tileheight));
-
-                    var slope = Slope.None;
-                    if (slopeDict.TryGetValue(gid, out var slopeId))
+                    var width = int.Parse(doc.DocumentElement.GetAttribute("width"));
+                    var height = int.Parse(doc.DocumentElement.GetAttribute("height"));
+                    
+                    var level = new Level
                     {
-                        if (slopeId == 0)
-                            slope = Slope.FloorDown;
-                        else if (slopeId == 1)
-                            slope = Slope.FloorUp;
-                        else if (slopeId == 2)
-                            slope = Slope.RoofDown;
-                        else if (slopeId == 3)
-                            slope = Slope.RoofUp;
-                    }
+                        Tiles = new ITile[width, height],
+                        Background = new ITile[width, height],
+                        Foreground = new ITile[width, height],
+                        Collisions = new ICollisionTile[width, height],
+                        Deaths = new List<Rectangle>()
+                    };
+                    CreateTiles(level, doc, width, height, tileSets);
+                    CreateObjects(level, doc);
 
-                    data.Collisions[x, y] = new CollisionTile(new Rectangle(x * tilewidth, y * tileheight, tilewidth, tileheight), slope);
+                    level.Name = stageName;
+                    level.Tilesets = tileSets.ToArray();
+                    
+                    return level;
                 }
+                //No document found
+                return null;
+            }
+        }
 
-                x++;
-                if (x >= width)
+        private IList<ITileset> readTilesets(XmlDocument doc)
+        {
+            var tilesets = new List<ITileset>();
+            var tilesetNodes = doc.DocumentElement.SelectNodes("tileset");
+            foreach (XmlNode tileset in tilesetNodes)
+            {
+                var tilesetName = tileset.Attributes["name"].Value;
+                var tileWidth = int.Parse(tileset.Attributes["tilewidth"].Value);
+                var tileHeight = int.Parse(tileset.Attributes["tileheight"].Value);
+
+                var firstgid = int.Parse(tileset.Attributes["firstgid"].Value);
+                var tilecount = int.Parse(tileset.Attributes["tilecount"].Value);
+                var columns = int.Parse(tileset.Attributes["columns"].Value);
+                var rows = tilecount / (columns + 1) + 1;
+
+                var imageNode = tileset.SelectSingleNode("image");
+                var imageWidth = int.Parse(imageNode.Attributes["width"].Value);
+                var imageHeight = int.Parse(imageNode.Attributes["height"].Value);
+                var source = imageNode.Attributes["source"].Value;
+
+                source = Path.GetFileNameWithoutExtension(source);
+
+                var newTileset = new Tileset(source, firstgid, tilecount, tileWidth, tileHeight, columns, rows);
+                foreach (XmlNode tile in tileset.SelectNodes("tile"))
                 {
-                    x = 0;
-                    y++;
+                    var id = int.Parse(tile.Attributes["id"].Value);
+                    var propertiesNode = tile.SelectSingleNode("properties");
+                    if (propertiesNode != null)
+                    {
+                        var props = new TileProperties();
+                        foreach (XmlNode property in propertiesNode)
+                        {
+                            var propName = property.Attributes["name"].Value;
+                            var value = property.Attributes["value"].Value;
+                            props[propName] = value;
+                        }
+                        if (props.Count > 0)
+                            newTileset.Tiles[id] = props;
+                    }
+                }
+                tilesets.Add(newTileset);
+            }
+            return tilesets;
+        }
+
+        private int getTilesetIndexFromGid(IList<ITileset> tilesets, int gid, out Rectangle spriteRect, out TileProperties properties)
+        {
+            for(int i = 0; i < tilesets.Count; ++i)
+            {
+                var tileset = tilesets[i];
+                if (gid >= tileset.FirstGid && gid < tileset.FirstGid + tileset.TileCount)
+                {
+                    int interalId = gid - tileset.FirstGid;
+                    int x = interalId % tileset.Columns;
+                    int y = interalId / tileset.Columns;
+                    spriteRect = new Rectangle(x * tileset.TileWidth, y * tileset.TileHeight, tileset.TileWidth, tileset.TileHeight);
+                    properties = tileset.Tiles[interalId];
+                    return i;
+                }
+            }
+            spriteRect = Rectangle.Empty;
+            properties = null;
+
+            return -1;
+        }
+
+        private void CreateTiles(ILevel data, XmlDocument doc, int width, int height, IList<ITileset> tilesets)
+        {
+            foreach (XmlNode layerNode in doc.DocumentElement.SelectNodes("layer"))
+            {
+                var layerWidth = int.Parse(layerNode.Attributes["width"].Value);
+                var layerHeight = int.Parse(layerNode.Attributes["height"].Value);
+                int count = -1;
+                foreach (XmlNode tileNode in layerNode.SelectSingleNode("data").SelectNodes("tile"))
+                {
+                    ++count;
+                    var gid = int.Parse(tileNode.Attributes["gid"].Value);
+                    Rectangle bounds;
+                    TileProperties prop;
+                    int tilesetIndex = getTilesetIndexFromGid(tilesets, gid, out bounds, out prop);
+                    if (tilesetIndex == -1)
+                        continue;
+
+                    int levelCol = count % layerWidth;
+                    int levelRow = count / layerWidth;
+                    if (levelCol >= width || levelRow >= height) //Out of bounds -> skip
+                        continue;
+
+                    var tile = new Tile(levelCol, levelRow, tilesetIndex, bounds);
+                    data.Tiles[levelCol, levelRow] = tile;
+
+                    string slopeString;
+                    Slope slope = Slope.None;
+                    if (prop != null && prop.TryGetValue("slope", out slopeString))
+                    {
+                        slope = (Slope) int.Parse(slopeString) + 1;
+                    }
+                    var col = new CollisionTile(bounds, slope);
+                    data.Collisions[levelCol, levelRow] = col;
                 }
             }
         }
 
-        private void CreateObjects(ILevel data, XmlDocument doc, int tilewidth, int tileheight)
+        private void CreateObjects(ILevel data, XmlDocument doc)
         {
             var objectGroup = doc?.DocumentElement?.SelectSingleNode("objectgroup[@name='objects']");
             if (objectGroup == null)
                 return;
-
-            var objects = objectGroup.SelectNodes("object");
-
-            for (int i = 0; i < objects?.Count; i++)
+            
+            foreach (XmlNode objectsNode in objectGroup.SelectNodes("object"))
             {
-                var x = int.Parse(objects[i].Attributes["x"].Value);
-                var y = int.Parse(objects[i].Attributes["y"].Value);
-                var width = int.Parse(objects[i].Attributes["width"].Value);
-                var height = int.Parse(objects[i].Attributes["height"].Value);
-                var name = objects[i].Attributes["name"].Value.ToLower();
-
+                var x = int.Parse(objectsNode.Attributes["x"].Value);
+                var y = int.Parse(objectsNode.Attributes["y"].Value);
+                var width = int.Parse(objectsNode.Attributes["width"].Value);
+                var height = int.Parse(objectsNode.Attributes["height"].Value);
+                var name = objectsNode.Attributes["name"].Value.ToLower();
                 if (name == "death")
                 {
-                    var rect = new Rectangle(x-1, y-1, width+1, height+1);
+                    var rect = new Rectangle(x - 1, y - 1, width + 1, height + 1);
                     data.Deaths.Add(rect);
-                    continue;
                 }
-
-                for (var ny = 0; ny < height / tileheight; ny++)
+                if (name == "start")
                 {
-                    for (var nx = 0; nx < width / tilewidth; nx++)
-                    {
-
-                        if (name == "start")
-                        {
-                            var posX = x;
-                            var posY = y;
-                            data.Start = new Vector2(posX, posY);
-                        }
-                    }
+                    data.Start = new Vector2(x, y);
                 }
             }
         }

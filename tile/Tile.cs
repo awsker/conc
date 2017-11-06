@@ -7,16 +7,18 @@ namespace tile
     {
         int X { get; set; }
         int Y { get; set; }
+        int TilesetIndex { get; set; }
         Rectangle Source { get; set; }
     }
 
     [DataContract(Name = "Tile")]
     public class Tile : ITile
     {
-        public Tile(int x, int y, Rectangle source)
+        public Tile(int x, int y, int tilesetIndex, Rectangle source)
         {
             X = x;
             Y = y;
+            TilesetIndex = tilesetIndex;
             Source = source;
         }
 
@@ -25,6 +27,9 @@ namespace tile
 
         [DataMember]
         public int Y { get; set; }
+
+        [DataMember]
+        public int TilesetIndex { get; set; }
 
         [DataMember]
         public Rectangle Source { get; set; }
