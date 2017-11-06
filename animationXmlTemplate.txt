@@ -1,0 +1,11 @@
+<animationContainer name="player" source="player.png" frameWidth=10 frameHeight=10>
+	<animation name="stopped" framespeed="2" loopType=2>
+		<frame originX=5 originY=5 sourceX=0 sourceY=0 sourceWidth=10 sourceHeight=10>
+	</animation>
+	<animation name="running" framespeed="2" loopType=1>
+		<frame width=10 height=10 originX=5 originY=5>
+		<frame width=10 height=10 originX=5 originY=5>
+		<frame width=10 height=10 originX=5 originY=5>
+		<frame width=10 height=10 originX=5 originY=5>
+	</animation>
+</animationContainer>
