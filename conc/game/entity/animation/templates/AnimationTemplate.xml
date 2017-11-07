@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Animations>
+  
+  <AnimationGroup Name="Player" Spritesheet="player.png" FrameWidth="16" FrameHeight="16">
+    <Animation Type="Idle" Playback="1">
+      <Frame X="0" Y="0" />
+      <Frame X="1" Y="0" />
+      <Frame X="3" Y="0" />
+      <Frame X="4" Y="0" />
+    </Animation>
+    <Animation Type="Run" Playback="1">
+      <Frame X="0" Y="1" />
+      <Frame X="1" Y="1" />
+      <Frame X="3" Y="1" />
+      <Frame X="4" Y="1" />
+    </Animation>
+    <Animation Type="Jump" Playback="1">
+      <Frame X="0" Y="2" />
+      <Frame X="1" Y="2" />
+      <Frame X="3" Y="2" />
+      <Frame X="4" Y="2" />
+    </Animation>
+  </AnimationGroup>
+
+  <AnimationGroup Name="Player" Spritesheet="player.png" FrameWidth="16" FrameHeight="16">
+    <Animation Type="Idle" Playback="1">
+      <Frame X="0" Y="0" />
+      <Frame X="1" Y="0" />
+      <Frame X="3" Y="0" />
+      <Frame X="4" Y="0" />
+    </Animation>
+    <Animation Type="Run" Playback="1">
+      <Frame X="0" Y="1" />
+      <Frame X="1" Y="1" />
+      <Frame X="3" Y="1" />
+      <Frame X="4" Y="1" />
+    </Animation>
+    <Animation Type="Jump" Playback="1">
+      <Frame X="0" Y="2" />
+      <Frame X="1" Y="2" />
+      <Frame X="3" Y="2" />
+      <Frame X="4" Y="2" />
+    </Animation>
+  </AnimationGroup>
+  
+</Animations>
