@@ -52,6 +52,9 @@
     <Compile Include="game\input\InputManager.cs" />
     <Compile Include="game\input\KeyboardInput.cs" />
     <Compile Include="game\input\PlayerInput.cs" />
+    <Compile Include="game\math\IPolygon.cs" />
+    <Compile Include="game\math\Line.cs" />
+    <Compile Include="game\math\RectangleF.cs" />
     <Compile Include="game\scenes\baseclass\Camera.cs" />
     <Compile Include="game\scenes\baseclass\Scene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
