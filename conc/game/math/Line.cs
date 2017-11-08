@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.Xna.Framework;
 
 namespace conc.game.math
@@ -31,6 +28,7 @@ namespace conc.game.math
         public Vector2 Start => _origin;
         public Vector2 Target => _target;
         public float Length => _length;
+        public float LengthSquared => _lengthSquared;
         public LineType LineType => _type;
         
         public bool Intersecting(Line other)
@@ -120,8 +118,6 @@ namespace conc.game.math
         {
             return type == LineType.Infinite || u >= 0f && (type == LineType.InfiniteAtTarget || u <= 1f);
         }
-
-        
     }
     
     public enum LineType
