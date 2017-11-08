@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Xml;
 using conc.game.entity;
+using conc.game.entity.animation;
 using conc.game.input;
 using conc.game.scenes.baseclass;
 using conc.game.util;
@@ -104,6 +106,11 @@ namespace conc.game.scenes
 
             _camera = new Camera(_videoManager.GraphicsDeviceManager);
             _camera.SetTarget(_player);
+
+            var animationReader = new AnimationReader();
+            animationReader.LoadAllTemplates();
+
+            var animationGroup = animationReader.GetAnimationGroup("Player");
         }
     }
 }

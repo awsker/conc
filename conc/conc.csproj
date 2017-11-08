@@ -42,6 +42,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="game\entity\animation\Animation.cs" />
+    <Compile Include="game\entity\animation\AnimationFrame.cs" />
+    <Compile Include="game\entity\animation\AnimationGroup.cs" />
+    <Compile Include="game\entity\animation\AnimationReader.cs" />
+    <Compile Include="game\entity\animation\AnimationType.cs" />
+    <Compile Include="game\entity\animation\PlaybackType.cs" />
     <Compile Include="game\entity\baseclass\Entity.cs" />
     <Compile Include="game\entity\baseclass\Transform.cs" />
     <Compile Include="game\entity\Player.cs" />
@@ -80,6 +86,7 @@
   <ItemGroup>
     <MonoGameContentReference Include="content\Content.mgcb" />
     <None Include="app.manifest" />
+    <EmbeddedResource Include="game\entity\animation\templates\AnimationTemplate.xml" />
     <Content Include="libopenal.1.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
