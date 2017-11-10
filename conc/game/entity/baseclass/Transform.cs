@@ -6,6 +6,6 @@ namespace conc.game.entity.baseclass
     {
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
-        public Vector2 Scale { get; set; }
+        public Vector2 Scale { get; set; } = new Vector2(1, 1);
     }
 }

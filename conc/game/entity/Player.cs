@@ -1,34 +1,18 @@
-﻿using conc.game.entity.baseclass;
+﻿using conc.game.entity.animation;
+using conc.game.entity.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace conc.game.entity
 {
-    public interface IPlayer : IEntity
+    public interface IPlayer : IAnimatedEntity
     {
     }
 
-    public class Player : Entity, IPlayer
+    public class Player : AnimatedEntity, IPlayer
     {
-        private Texture2D _texture;
-
-        public Player(Vector2 position = new Vector2()) : base(position)
+        public Player(Vector2 position, IAnimator animator) : base(position, animator)
         {
-        }
-
-        public override void LoadContent(ContentManager contentManager)
-        {
-            _texture = contentManager.Load<Texture2D>("trash/temp");
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(_texture, Transform.Position, Color.White);
         }
     }
 }

@@ -28,6 +28,7 @@ namespace conc.game.scenes
         private InputManager _inputManager;
         private VideoModeManager _videoManager;
         private IPlayer _player;
+        private IAnimationReader _animationReader;
 
         public override void SetGameManager(IGameManager gameManager)
         {
@@ -41,17 +42,44 @@ namespace conc.game.scenes
         {
             var playerPosition = _player.Transform.Position;
 
+            //if (_inputManager.IsDown(ControlButtons.Right, 0))
+            //    playerPosition.X += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+            //if (_inputManager.IsDown(ControlButtons.Left, 0))
+            //    playerPosition.X -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+            //if (_inputManager.IsDown(ControlButtons.Up, 0))
+            //    playerPosition.Y -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+            //if (_inputManager.IsDown(ControlButtons.Down, 0))
+            //    playerPosition.Y += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+
+            var velocity = _player.Velocity;
+            if (velocity.X > 0)
+                velocity.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 10f;
+            else
+                velocity.X += (float)gameTime.ElapsedGameTime.TotalSeconds * 10f;
+
+            if (velocity.X < .1f && velocity.X > 0 || velocity.X > -.1f && velocity.X < 0)
+                velocity.X = 0;
+
             if (_inputManager.IsDown(ControlButtons.Right, 0))
-                playerPosition.X += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                velocity.X += (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
             if (_inputManager.IsDown(ControlButtons.Left, 0))
-                playerPosition.X -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                velocity.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
             if (_inputManager.IsDown(ControlButtons.Up, 0))
-                playerPosition.Y -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                playerPosition.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
             if (_inputManager.IsDown(ControlButtons.Down, 0))
-                playerPosition.Y += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                playerPosition.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
 
-            _player.Transform.Position = playerPosition;
+            GameDebug.Log("Velocity", velocity);
 
+            velocity.X = MathHelper.Clamp(velocity.X, -3, 3);
+            velocity.Y = MathHelper.Clamp(velocity.Y, -3, 3);
+
+            _player.Velocity = velocity;
+
+            _player.Transform.Position += velocity;
+            //_player.Transform.Position = playerPosition;
+
+            _player.Update(gameTime);
             _camera.Update(gameTime);
         }
 
@@ -60,7 +88,7 @@ namespace conc.game.scenes
             spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null,
                 _camera.Transform);
 
-            drawLevel(spriteBatch);
+            DrawLevel(spriteBatch);
 
             foreach (var entity in Entities.Where(e => e.IsVisible))
                 entity.Draw(spriteBatch);
@@ -68,7 +96,7 @@ namespace conc.game.scenes
             spriteBatch.End();
         }
 
-        private void drawLevel(SpriteBatch spriteBatch)
+        private void DrawLevel(SpriteBatch spriteBatch)
         {
             for (var y = 0; y < _level.Width; y++)
             {
@@ -100,17 +128,18 @@ namespace conc.game.scenes
                 var tileset = _level.Tilesets[i];
                 _tilesetTextures[i] = _contentManager.Load<Texture2D>(tilesetPath + tileset.Source);
             }
-            _player = new Player(_level.Start);
+
+            _animationReader = new AnimationReader();
+            _animationReader.LoadAllTemplates();
+            
+            _player = new Player(_level.Start, _animationReader.GetAnimator("Player"));
             _player.LoadContent(_contentManager);
             Entities.Add(_player);
 
             _camera = new Camera(_videoManager.GraphicsDeviceManager);
             _camera.SetTarget(_player);
 
-            var animationReader = new AnimationReader();
-            animationReader.LoadAllTemplates();
-
-            var animationGroup = animationReader.GetAnimationGroup("Player");
+            
         }
     }
 }

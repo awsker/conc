@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-
-namespace conc.game.entity.animation
+﻿namespace conc.game.entity.animation
 {
     public interface IAnimation
     {
         AnimationType Type { get; set; }
-        IList<IAnimationFrame> Frames { get; }
+        IAnimationFrame[] Frames { get; set; }
     }
 
     public class Animation : IAnimation
     {
         public AnimationType Type { get; set; }
-        public IList<IAnimationFrame> Frames { get; } = new List<IAnimationFrame>();
+        public IAnimationFrame[] Frames { get; set; }
     }
 }

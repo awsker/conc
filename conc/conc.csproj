@@ -44,10 +44,11 @@
   <ItemGroup>
     <Compile Include="game\entity\animation\Animation.cs" />
     <Compile Include="game\entity\animation\AnimationFrame.cs" />
-    <Compile Include="game\entity\animation\AnimationGroup.cs" />
+    <Compile Include="game\entity\animation\Animator.cs" />
     <Compile Include="game\entity\animation\AnimationReader.cs" />
     <Compile Include="game\entity\animation\AnimationType.cs" />
     <Compile Include="game\entity\animation\PlaybackType.cs" />
+    <Compile Include="game\entity\baseclass\AnimatedEntity.cs" />
     <Compile Include="game\entity\baseclass\Entity.cs" />
     <Compile Include="game\entity\baseclass\Transform.cs" />
     <Compile Include="game\entity\Player.cs" />
