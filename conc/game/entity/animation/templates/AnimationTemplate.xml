@@ -4,38 +4,17 @@
   
   <Animator Name="Player" Spritesheet="temp" FrameWidth="16" FrameHeight="16">
     <Animation Type="Idle" Playback="1">
-      <Frame X="0" Y="0" />
+      <Frame X="0" Y="0" OffsetX="8" OffsetY="8"/>
     </Animation>
     <Animation Type="Run" Playback="1">
-      <Frame X="0" Y="1" />
-      <Frame X="1" Y="1" />
-      <Frame X="2" Y="1" />
-      <Frame X="3" Y="1" />
+      <Frame X="0" Y="1" OffsetX="8" OffsetY="8" />
+      <Frame X="1" Y="1" OffsetX="8" OffsetY="8" />
+      <Frame X="2" Y="1" OffsetX="8" OffsetY="8" />
+      <Frame X="3" Y="1" OffsetX="8" OffsetY="8" />
     </Animation>
     <Animation Type="Jump" Playback="1">
-      <Frame X="0" Y="2" />
-      <Frame X="2" Y="2" />
-    </Animation>
-  </Animator>
-
-  <Animator Name="Player2" Spritesheet="temp" FrameWidth="16" FrameHeight="16">
-    <Animation Type="Idle" Playback="1">
-      <Frame X="0" Y="0" />
-      <Frame X="1" Y="0" />
-      <Frame X="3" Y="0" />
-      <Frame X="4" Y="0" />
-    </Animation>
-    <Animation Type="Run" Playback="1">
-      <Frame X="0" Y="1" />
-      <Frame X="1" Y="1" />
-      <Frame X="3" Y="1" />
-      <Frame X="4" Y="1" />
-    </Animation>
-    <Animation Type="Jump" Playback="1">
-      <Frame X="0" Y="2" />
-      <Frame X="1" Y="2" />
-      <Frame X="3" Y="2" />
-      <Frame X="4" Y="2" />
+      <Frame X="0" Y="2" OffsetX="8" OffsetY="8" />
+      <Frame X="2" Y="2" OffsetX="8" OffsetY="8" />
     </Animation>
   </Animator>
   

@@ -70,7 +70,9 @@ namespace conc.game.entity.animation
                                 var frame = new AnimationFrame
                                 {
                                     X = int.Parse(frameNode.Attributes["X"].Value),
-                                    Y = int.Parse(frameNode.Attributes["Y"].Value)
+                                    Y = int.Parse(frameNode.Attributes["Y"].Value),
+                                    OffsetX = int.Parse(frameNode.Attributes["OffsetX"].Value),
+                                    OffsetY = int.Parse(frameNode.Attributes["OffsetY"].Value)
                                 };
 
                                 frames.Add(frame);

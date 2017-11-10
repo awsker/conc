@@ -66,7 +66,7 @@ namespace conc.game.entity.baseclass
                 _animator.FrameWidth,
                 _animator.FrameHeight);
 
-            var origin = new Vector2(_animator.FrameWidth / 2f, _animator.FrameHeight / 2f);
+            var origin = new Vector2(_currentFrame.OffsetX, _currentFrame.OffsetY);
 
             spriteBatch.Draw(_texture, Transform.Position, sourceRectangle, Color.White, Transform.Rotation, origin, Transform.Scale, SpriteEffects.None, 0f);
         }
