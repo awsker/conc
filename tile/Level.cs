@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
+using tile.math;
 
 namespace tile
 {
@@ -11,7 +12,7 @@ namespace tile
         ITile[,] Tiles { get; set; }
         ITile[,] Background { get; set; }
         ITile[,] Foreground { get; set; }
-        ICollisionTile[,] Collisions { get; set; }
+        Line[] CollisionLines { get; set; }
         Rectangle[,] CameraCollisions { get; set; }
         IList<Rectangle> Deaths { get; set; }
         Vector2 Start { get; set; }
@@ -43,11 +44,10 @@ namespace tile
         public ITile[,] Foreground { get; set; }
 
         [DataMember]
-        public ICollisionTile[][] CollisionsForSerialize { get; set; }
-        public ICollisionTile[,] Collisions { get; set; }
+        public Line[] CollisionLines { get; set; }
         public Rectangle[,] CameraCollisions { get; set; }
 
-//        [DataMember]
+//      [DataMember]
         public IList<Rectangle> Deaths { get; set; }
 
         [DataMember]
@@ -65,7 +65,6 @@ namespace tile
             TilesForSerialize = SerializeTileArray(Tiles);
             BackgroundForSerialize = SerializeTileArray(Background);
             ForegroundForSerialize = SerializeTileArray(Foreground);
-            CollisionsForSerialize = SerializeCollisionArray(Collisions);
         }
 
         [OnDeserialized]
@@ -74,7 +73,6 @@ namespace tile
             Tiles = DeserializeTileArray(TilesForSerialize);
             Background = DeserializeTileArray(BackgroundForSerialize);
             Foreground = DeserializeTileArray(ForegroundForSerialize);
-            Collisions = DeserializeCollisionArray(CollisionsForSerialize);
         }
 
         private ITile[][] SerializeTileArray(ITile[,] from)
@@ -85,23 +83,6 @@ namespace tile
             for (var i = 0; i < dimension0; i++)
             {
                 to[i] = new ITile[dimension1];
-                for (var j = 0; j < dimension1; j++)
-                {
-                    to[i][j] = from[i, j];
-                }
-            }
-
-            return to;
-        }
-
-        private ICollisionTile[][] SerializeCollisionArray(ICollisionTile[,] from)
-        {
-            var dimension0 = from.GetLength(0);
-            var dimension1 = from.GetLength(1);
-            var to = new ICollisionTile[dimension0][];
-            for (var i = 0; i < dimension0; i++)
-            {
-                to[i] = new ICollisionTile[dimension1];
                 for (var j = 0; j < dimension1; j++)
                 {
                     to[i][j] = from[i, j];
@@ -127,20 +108,5 @@ namespace tile
             return to;
         }
 
-        private ICollisionTile[,] DeserializeCollisionArray(ICollisionTile[][] from)
-        {
-            var dimension0 = from.Length;
-            var dimension1 = from[0].Length;
-            var to = new ICollisionTile[dimension0, dimension1];
-            for (var i = 0; i < dimension0; i++)
-            {
-                for (var j = 0; j < dimension1; j++)
-                {
-                    to[i, j] = from[i][j];
-                }
-            }
-
-            return to;
-        }
     }
 }

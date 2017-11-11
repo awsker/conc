@@ -71,15 +71,7 @@ namespace tile
                 typeNamespace = dictionary.Add("tile");
                 return true;
             }
-
-            if (type == typeof(CollisionTile))
-            {
-                var dictionary = new XmlDictionary();
-                typeName = dictionary.Add("CollisionTile");
-                typeNamespace = dictionary.Add("tile");
-                return true;
-            }
-
+            
             if (type == typeof(Tileset))
             {
                 var dictionary = new XmlDictionary();
@@ -95,10 +87,7 @@ namespace tile
         {
             if (typeName == "Tile" && typeNamespace == "tile")
                 return typeof(Tile);
-
-            if (typeName == "CollisionTile" && typeNamespace == "tile")
-                return typeof(CollisionTile);
-
+            
             if (typeName == "Tileset" && typeNamespace == "tile")
                 return typeof(Tileset);
 

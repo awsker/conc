@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using tile;
 using Microsoft.Xna.Framework;
+using tile.math;
 
 namespace BGStageGenerator
 {
@@ -42,13 +43,12 @@ namespace BGStageGenerator
 
                     var width = int.Parse(doc.DocumentElement.GetAttribute("width"));
                     var height = int.Parse(doc.DocumentElement.GetAttribute("height"));
-                    
+
                     var level = new Level
                     {
                         Tiles = new ITile[width, height],
                         Background = new ITile[width, height],
                         Foreground = new ITile[width, height],
-                        Collisions = new ICollisionTile[width, height],
                         Deaths = new List<Rectangle>()
                     };
                     CreateTiles(level, doc, width, height, tileSets);
@@ -56,7 +56,8 @@ namespace BGStageGenerator
 
                     level.Name = stageName;
                     level.Tilesets = tileSets.ToArray();
-                    
+                    level.CollisionLines = getCollisionPolygons(level);
+
                     return level;
                 }
                 //No document found
@@ -109,9 +110,10 @@ namespace BGStageGenerator
             return tilesets;
         }
 
-        private int getTilesetIndexFromGid(IList<ITileset> tilesets, int gid, out Rectangle spriteRect, out TileProperties properties)
+        private int getTilesetIndexFromGid(IList<ITileset> tilesets, int gid, out Rectangle spriteRect,
+            out TileProperties properties)
         {
-            for(int i = 0; i < tilesets.Count; ++i)
+            for (int i = 0; i < tilesets.Count; ++i)
             {
                 var tileset = tilesets[i];
                 if (gid >= tileset.FirstGid && gid < tileset.FirstGid + tileset.TileCount)
@@ -119,7 +121,8 @@ namespace BGStageGenerator
                     int interalId = gid - tileset.FirstGid;
                     int x = interalId % tileset.Columns;
                     int y = interalId / tileset.Columns;
-                    spriteRect = new Rectangle(x * tileset.TileWidth, y * tileset.TileHeight, tileset.TileWidth, tileset.TileHeight);
+                    spriteRect = new Rectangle(x * tileset.TileWidth, y * tileset.TileHeight, tileset.TileWidth,
+                        tileset.TileHeight);
                     properties = tileset.Tiles[interalId];
                     return i;
                 }
@@ -155,14 +158,13 @@ namespace BGStageGenerator
                     var tile = new Tile(levelCol, levelRow, tilesetIndex, bounds);
                     data.Tiles[levelCol, levelRow] = tile;
 
-                    string slopeString;
                     Slope slope = Slope.None;
-                    if (prop != null && prop.TryGetValue("slope", out slopeString))
+                    if (prop != null && prop.TryGetValue("slope", out var slopeString))
                     {
                         slope = (Slope) int.Parse(slopeString) + 1;
+                        tile.Slope = slope;
                     }
-                    var col = new CollisionTile(bounds, slope);
-                    data.Collisions[levelCol, levelRow] = col;
+
                 }
             }
         }
@@ -172,7 +174,7 @@ namespace BGStageGenerator
             var objectGroup = doc?.DocumentElement?.SelectSingleNode("objectgroup[@name='objects']");
             if (objectGroup == null)
                 return;
-            
+
             foreach (XmlNode objectsNode in objectGroup.SelectNodes("object"))
             {
                 var x = int.Parse(objectsNode.Attributes["x"].Value);
@@ -191,5 +193,12 @@ namespace BGStageGenerator
                 }
             }
         }
+
+        private Line[] getCollisionPolygons(ILevel level)
+        {
+            var collisionGenerator = new CollisionPolygonGenerator();
+            return collisionGenerator.GetCollisionPolygons(level);
+        }
+
     }
 }
