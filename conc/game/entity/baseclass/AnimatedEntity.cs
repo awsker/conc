@@ -70,5 +70,9 @@ namespace conc.game.entity.baseclass
 
             spriteBatch.Draw(_texture, Transform.Position, sourceRectangle, Color.White, Transform.Rotation, origin, Transform.Scale, SpriteEffects.None, 0f);
         }
+
+        public override int Width => _animator.FrameWidth;
+        public override int Height => _animator.FrameHeight;
+        public override Point Offset => new Point(_currentFrame.OffsetX, _currentFrame.OffsetY);
     }
 }

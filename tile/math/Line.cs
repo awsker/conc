@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
 
@@ -42,13 +41,25 @@ namespace tile.math
             get { return _target; }
             set
             {
-                _origin = value;
+                _target = value;
                 recalculateLenghts();
             }
         }
 
         public float Length => _length;
         public float LengthSquared => _lengthSquared;
+
+        public Vector2 Normal
+        {
+            get
+            {
+                var v = Vector;
+                v.Normalize();
+                return new Vector2(v.Y, -v.X);
+            }
+        }
+        
+        public Vector2 Vector => _target - _origin;
 
         [DataMember]
         public LineType LineType
@@ -63,17 +74,15 @@ namespace tile.math
 
         private void recalculateLenghts()
         {
-            var l = _target - _origin;
-            _length = l.Length();
-            _lengthSquared = l.LengthSquared();
+            var v = Vector;
+            _length = v.Length();
+            _lengthSquared = v.LengthSquared();
         }
         
         public bool Intersecting(Line other)
         {
             return Intersecting(other, out Vector2 temp);
         }
-
-        public static Stopwatch Stop = new Stopwatch();
 
         public bool Intersecting(Line other, out Vector2 pointOfIntersection)
         {
@@ -93,7 +102,7 @@ namespace tile.math
                 float u_a = ((p4.X - p3.X) * (p1.Y - p3.Y) - (p4.Y - p3.Y) * (p1.X - p3.X)) / denominator;
                 float u_b = ((p2.X - p1.X) * (p1.Y - p3.Y) - (p2.Y - p1.Y) * (p1.X - p3.X)) / denominator;
 
-                pointOfIntersection = p1 + p2 * u_a;
+                pointOfIntersection = p1 + (p2 - p1) * u_a;
 
                 //Is intersecting if u_a and u_b are between 0 and 1
                 return withinLine(u_a, _type) && withinLine(u_b, other._type);
@@ -138,7 +147,7 @@ namespace tile.math
 
         public float DistanceToPoint(Vector2 point, out Vector2 closestPointOnLine)
         {
-            var l =  Vector2.Normalize(_target - _origin);
+            var l =  Vector2.Normalize(Vector);
             float distOnLine = Vector2.Dot(point - _origin, l);
             var u = distOnLine / Length;
             if (withinLine(u, _type))

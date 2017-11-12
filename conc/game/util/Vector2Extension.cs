@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
 
 namespace conc.game.util
 {
     public static class Vector2Extension
     {
-        //public static void 
+        public static Vector2 Normalized(this Vector2 v)
+        {
+            return Vector2.Normalize(v);
+        }
     }
 }

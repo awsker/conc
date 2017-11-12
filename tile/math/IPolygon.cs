@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net.Mail;
-
-namespace tile.math
+﻿namespace tile.math
 {
     public interface IPolygon
     {

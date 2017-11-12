@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Xml;
 using conc.game.entity;
 using conc.game.entity.animation;
+using conc.game.entity.movement;
 using conc.game.input;
 using conc.game.scenes.baseclass;
 using conc.game.util;
@@ -16,6 +16,7 @@ namespace conc.game.scenes
     public interface IGameScene : IScene
     {
         void SetLevel(ILevel level);
+        ILevel CurrentLevel { get; }
     }
 
     public class GameScene : Scene, IGameScene
@@ -41,16 +42,7 @@ namespace conc.game.scenes
         public override void Update(GameTime gameTime)
         {
             var playerPosition = _player.Transform.Position;
-
-            //if (_inputManager.IsDown(ControlButtons.Right, 0))
-            //    playerPosition.X += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
-            //if (_inputManager.IsDown(ControlButtons.Left, 0))
-            //    playerPosition.X -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
-            //if (_inputManager.IsDown(ControlButtons.Up, 0))
-            //    playerPosition.Y -= (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
-            //if (_inputManager.IsDown(ControlButtons.Down, 0))
-            //    playerPosition.Y += (float) gameTime.ElapsedGameTime.TotalSeconds * 150f;
-
+            
             var velocity = _player.Velocity;
             if (velocity.X > 0)
                 velocity.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 10f;
@@ -64,22 +56,27 @@ namespace conc.game.scenes
                 velocity.X += (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
             if (_inputManager.IsDown(ControlButtons.Left, 0))
                 velocity.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
-            if (_inputManager.IsDown(ControlButtons.Up, 0))
-                playerPosition.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+
             if (_inputManager.IsDown(ControlButtons.Down, 0))
-                playerPosition.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 150f;
+                velocity.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
+            if (_inputManager.IsDown(ControlButtons.Up, 0))
+                velocity.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
 
             GameDebug.Log("Velocity", velocity);
-
-            velocity.X = MathHelper.Clamp(velocity.X, -3, 3);
-            velocity.Y = MathHelper.Clamp(velocity.Y, -3, 3);
-
+            
             _player.Velocity = velocity;
 
-            _player.Transform.Position += velocity;
-            //_player.Transform.Position = playerPosition;
+            foreach (var entity in Entities)
+            {
+                entity.Update(gameTime);
+            }
 
-            _player.Update(gameTime);
+            var movementHandler = new MovementHandler();
+            foreach (var movingEntity in Entities.OfType<IMovingEntity>())
+            {
+                movementHandler.HandleMovement(gameTime, movingEntity, _level.CollisionLines);
+            }
+
             _camera.Update(gameTime);
         }
 
@@ -132,14 +129,15 @@ namespace conc.game.scenes
             _animationReader = new AnimationReader();
             _animationReader.LoadAllTemplates();
             
-            _player = new Player(_level.Start, _animationReader.GetAnimator("Player"));
+            _player = new Player(_level.Start, _animationReader.GetAnimator("Player"), this);
             _player.LoadContent(_contentManager);
+
             Entities.Add(_player);
 
             _camera = new Camera(_videoManager.GraphicsDeviceManager);
             _camera.SetTarget(_player);
-
-            
         }
+
+        public ILevel CurrentLevel => _level;
     }
 }

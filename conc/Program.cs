@@ -1,6 +1,4 @@
 ﻿using System;
-using conc.game.math;
-using Microsoft.Xna.Framework;
 
 namespace conc
 {

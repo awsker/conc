@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using conc.game.math;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,13 +7,16 @@ namespace conc.game.entity.baseclass
 {
     public interface IEntity
     {
-        Vector2 Velocity { get; set; }
         Transform Transform { get; }
         void LoadContent(ContentManager contentManager);
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
         bool IsVisible { get; }
         bool IsDestroyed { get; }
+        int Width { get; }
+        int Height { get; }
+        Point Offset { get; }
+        Box BoundingBox { get; }
     }
 
     public abstract class Entity : IEntity
@@ -28,8 +32,6 @@ namespace conc.game.entity.baseclass
         }
 
         public Transform Transform { get; }
-        public Vector2 Velocity { get; set; }
-
         public Vector2 Position
         {
             get => Transform.Position;
@@ -57,5 +59,11 @@ namespace conc.game.entity.baseclass
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {}
+
+        public abstract int Width { get; }
+        public abstract int Height { get; }
+        public virtual Point Offset => Point.Zero;
+
+        public virtual Box BoundingBox => new Box(Width, Height) { Scale = Scale, Origin = new Vector2(Offset.X, Offset.Y), Position = Position, Rotation = Rotation };
     }
 }

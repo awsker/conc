@@ -48,7 +48,6 @@
     <Compile Include="LevelSerializer.cs" />
     <Compile Include="math\IPolygon.cs" />
     <Compile Include="math\Line.cs" />
-    <Compile Include="math\Polygon.cs" />
     <Compile Include="math\RectangleF.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Level.cs" />
