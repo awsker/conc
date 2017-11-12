@@ -31,46 +31,24 @@ namespace conc.game.scenes
         private IPlayer _player;
         private IAnimationReader _animationReader;
 
-        public override void SetGameManager(IGameManager gameManager)
+        public override IGameManager GameManager
         {
-            _gameManager = gameManager;
-            _contentManager = gameManager.Get<ContentManager>();
-            _inputManager = gameManager.Get<InputManager>();
-            _videoManager = gameManager.Get<VideoModeManager>();
+            get { return _gameManager; }
+            set
+            {
+                _gameManager = value;
+                _contentManager = value.Get<ContentManager>();
+                _inputManager = value.Get<InputManager>();
+                _videoManager = value.Get<VideoModeManager>();
+            }
         }
 
         public override void Update(GameTime gameTime)
         {
-            var playerPosition = _player.Transform.Position;
-            
-            var velocity = _player.Velocity;
-            if (velocity.X > 0)
-                velocity.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 10f;
-            else
-                velocity.X += (float)gameTime.ElapsedGameTime.TotalSeconds * 10f;
-
-            if (velocity.X < .1f && velocity.X > 0 || velocity.X > -.1f && velocity.X < 0)
-                velocity.X = 0;
-
-            if (_inputManager.IsDown(ControlButtons.Right, 0))
-                velocity.X += (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
-            if (_inputManager.IsDown(ControlButtons.Left, 0))
-                velocity.X -= (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
-
-            if (_inputManager.IsDown(ControlButtons.Down, 0))
-                velocity.Y += (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
-            if (_inputManager.IsDown(ControlButtons.Up, 0))
-                velocity.Y -= (float)gameTime.ElapsedGameTime.TotalSeconds * 25f;
-
-            GameDebug.Log("Velocity", velocity);
-            
-            _player.Velocity = velocity;
-
             foreach (var entity in Entities)
             {
                 entity.Update(gameTime);
             }
-
             var movementHandler = new MovementHandler();
             foreach (var movingEntity in Entities.OfType<IMovingEntity>())
             {
@@ -115,7 +93,7 @@ namespace conc.game.scenes
 
         public void SetLevel(ILevel level)
         {
-            Entities.Clear();
+            _entities.Clear();
             _level = level;
             
             var tilesetPath = Path.GetFullPath(@"..\..\..\..\content\tiledgenerator\content\");
@@ -129,10 +107,9 @@ namespace conc.game.scenes
             _animationReader = new AnimationReader();
             _animationReader.LoadAllTemplates();
             
-            _player = new Player(_level.Start, _animationReader.GetAnimator("Player"), this);
+            _player = new Player(_level.Start, _animationReader.GetAnimator("Player"));
             _player.LoadContent(_contentManager);
-
-            Entities.Add(_player);
+            AddEntity(_player);
 
             _camera = new Camera(_videoManager.GraphicsDeviceManager);
             _camera.SetTarget(_player);

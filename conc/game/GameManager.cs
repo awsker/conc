@@ -93,7 +93,7 @@ namespace conc.game
         public void SetScene(IScene scene)
         {
             _nextScene = scene;
-            _nextScene.SetGameManager(this);
+            _nextScene.GameManager = this;
         }
         #endregion
 

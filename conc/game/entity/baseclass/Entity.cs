@@ -1,7 +1,9 @@
 ﻿using conc.game.math;
+using conc.game.scenes.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using OpenGL;
 
 namespace conc.game.entity.baseclass
 {
@@ -17,6 +19,7 @@ namespace conc.game.entity.baseclass
         int Height { get; }
         Point Offset { get; }
         Box BoundingBox { get; }
+        IScene Scene { get; set; }
     }
 
     public abstract class Entity : IEntity
@@ -65,5 +68,7 @@ namespace conc.game.entity.baseclass
         public virtual Point Offset => Point.Zero;
 
         public virtual Box BoundingBox => new Box(Width, Height) { Scale = Scale, Origin = new Vector2(Offset.X, Offset.Y), Position = Position, Rotation = Rotation };
+
+        public IScene Scene { get; set; }
     }
 }
