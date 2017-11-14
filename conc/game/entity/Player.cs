@@ -31,7 +31,7 @@ namespace conc.game.entity
             {
                 Acceleration = 1000f,
                 Deacceleration = 1000f,
-                JumpSpeed = 200f,
+                JumpSpeed = 500f,
                 MaxSpeed = 100f,
                 Gravity = 300f,
                 TerminalVelocity = 800f,
@@ -81,7 +81,7 @@ namespace conc.game.entity
                     return;
                 }
 
-                var newY = -((float) gameTime.ElapsedGameTime.TotalSeconds * distanceLeft * 500f);
+                var newY = -((float) gameTime.ElapsedGameTime.TotalSeconds * distanceLeft * _settings.JumpSpeed);
                 Velocity = new Vector2(Velocity.X, newY);
             }
         }
