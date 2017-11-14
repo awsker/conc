@@ -19,9 +19,10 @@ namespace conc.game.entity
     {
         private bool _onGround, _onLeftWall, _onRightWall;
         private Line _currentGround;
-        private PlayerMovementSettings _settings;
+        private readonly PlayerMovementSettings _settings;
         private int _playerNo = 0;
         private int _jumpCooldown = 0;
+        private float _jumpPeak;
 
         public Player(Vector2 position, IAnimator animator) : base(position, animator)
         {
@@ -63,9 +64,26 @@ namespace conc.game.entity
             base.Update(gameTime);
             if (_jumpCooldown > 0)
                 --_jumpCooldown;
+            updateJump(gameTime);
             updateInAirStatus();
             applyGravity(gameTime);
             readInput(gameTime);
+        }
+
+        private void updateJump(GameTime gameTime)
+        {
+            if (_jumpPeak != 0f)
+            {
+                var distanceLeft = Transform.Position.Y - _jumpPeak;
+                if (distanceLeft <= 20f)
+                {
+                    _jumpPeak = 0f;
+                    return;
+                }
+
+                var newY = -((float) gameTime.ElapsedGameTime.TotalSeconds * distanceLeft * 500f);
+                Velocity = new Vector2(Velocity.X, newY);
+            }
         }
 
         private void applyGravity(GameTime gameTime)
@@ -153,8 +171,8 @@ namespace conc.game.entity
                 var costheta = Vector2.Dot(_currentGround.Vector.Normalized(), new Vector2(1f, 0f));
                 maxSpeedX = _settings.MaxSpeed * Math.Abs(costheta);
             }
+            
             //Move left
-
             if (inputManager.IsDown(ControlButtons.Left, _playerNo) && !inputManager.IsDown(ControlButtons.Right, _playerNo) && Velocity.X > -maxSpeedX)
             {
                 var directionVector = _currentGround?.Vector.Normalized()* -1 ?? new Vector2(-1f, 0f);
@@ -183,12 +201,16 @@ namespace conc.game.entity
             }
 
             //Jump
-            if (inputManager.IsDown(ControlButtons.Jump, _playerNo) && _onGround && _jumpCooldown == 0)
+            if (inputManager.IsDown(ControlButtons.Jump, _playerNo) && _onGround)
             {
-                Velocity = new Vector2(Velocity.X, -_settings.JumpSpeed);
+                _jumpPeak = Transform.Position.Y - 50f;
                 _onGround = false;
-                //10 frames between jumps
-                _jumpCooldown = 10;
+            }
+
+            if (!inputManager.IsDown(ControlButtons.Jump, _playerNo) && !_onGround && _jumpPeak != 0f)
+            {
+                _jumpPeak = 0f;
+                Velocity = new Vector2(Velocity.X, 0f);
             }
         }
     }
