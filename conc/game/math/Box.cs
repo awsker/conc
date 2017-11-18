@@ -28,6 +28,7 @@ namespace conc.game.math
         public float Rotation { get; set; }
         public float Width => _width;
         public float Height => _height;
+        public Rectangle Rectangle => new Rectangle((int)Position.X, (int)Position.Y, (int)Width, (int)Height);
 
         private Line[] calculateLines()
         {

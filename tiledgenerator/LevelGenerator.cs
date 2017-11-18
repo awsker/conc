@@ -9,12 +9,7 @@ using tile.math;
 
 namespace BGStageGenerator
 {
-    public interface ILevelGenerator
-    {
-        IList<ILevel> Generate();
-    }
-
-    public class LevelGenerator : ILevelGenerator
+    public class LevelGenerator
     {
         public IList<ILevel> Generate()
         {
@@ -49,7 +44,8 @@ namespace BGStageGenerator
                         Tiles = new ITile[width, height],
                         Background = new ITile[width, height],
                         Foreground = new ITile[width, height],
-                        Deaths = new List<Rectangle>()
+                        Deaths = new List<Rectangle>(),
+                        Checkpoints = new List<Rectangle>()
                     };
                     CreateTiles(level, doc, width, height, tileSets);
                     CreateObjects(level, doc);
@@ -68,6 +64,7 @@ namespace BGStageGenerator
         private IList<ITileset> readTilesets(XmlDocument doc)
         {
             var tilesets = new List<ITileset>();
+
             var tilesetNodes = doc.DocumentElement.SelectNodes("tileset");
             foreach (XmlNode tileset in tilesetNodes)
             {
@@ -184,12 +181,20 @@ namespace BGStageGenerator
                 var name = objectsNode.Attributes["name"].Value.ToLower();
                 if (name == "death")
                 {
-                    var rect = new Rectangle(x - 1, y - 1, width + 1, height + 1);
-                    data.Deaths.Add(rect);
+                    data.Deaths.Add(new Rectangle(x - 1, y - 1, width + 1, height + 1));
                 }
-                if (name == "start")
+                else if (name == "start")
                 {
-                    data.Start = new Vector2(x, y);
+                    data.Start = new Rectangle(x, y, width, height);
+                    data.Checkpoints.Add(data.Start);
+                }
+                else if (name == "checkpoint")
+                {
+                    data.Checkpoints.Add(new Rectangle(x, y, width, height));
+                }
+                else if (name == "goal")
+                {
+                    data.Goal = new Rectangle(x, y, width, height);
                 }
             }
         }

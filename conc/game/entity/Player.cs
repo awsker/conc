@@ -13,32 +13,40 @@ namespace conc.game.entity
 {
     public interface IPlayer : IAnimatedEntity, IMovingEntity
     {
+        bool IsAlive { get; }
     }
 
     public class Player : AnimatedEntity, IPlayer
     {
-        private bool _onGround, _onLeftWall, _onRightWall;
+        private bool _onGround, _onLeftWall, _onRightWall, _onRoof;
         private Line _currentGround;
         private readonly PlayerMovementSettings _settings;
         private int _playerNo = 0;
-        private int _jumpCooldown = 0;
+
         private float _jumpPeak;
+        private bool _isJumping;
+        private bool _cancelJump;
+
+        private Rectangle _checkpoint;
 
         public Player(Vector2 position, IAnimator animator) : base(position, animator)
         {
             CollisionSettings = new CollisionSettings(true, ActionOnCollision.PushOut, 0f, 1f);
-            _settings = new PlayerMovementSettings()
+            _settings = new PlayerMovementSettings
             {
                 Acceleration = 1000f,
                 Deacceleration = 1000f,
                 JumpSpeed = 500f,
-                MaxSpeed = 100f,
+                JumpHeight = 75f,
+                MaxSpeed = 200f,
                 Gravity = 300f,
                 TerminalVelocity = 800f,
-                InAirAccelerationFactor = 0.5f,
-                InAirDeaccelerationFactor = 0.5f
-
+                InAirAccelerationFactor = .7f,
+                InAirDeaccelerationFactor = .7f
             };
+
+            if (Scene is GameScene gameScene)
+                _checkpoint = gameScene.CurrentLevel.Checkpoints[0];
         }
         
         public Vector2 Velocity { get; set; }
@@ -62,23 +70,34 @@ namespace conc.game.entity
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            if (_jumpCooldown > 0)
-                --_jumpCooldown;
+
             updateJump(gameTime);
             updateInAirStatus();
+            updateLevelObjects();
             applyGravity(gameTime);
             readInput(gameTime);
         }
 
         private void updateJump(GameTime gameTime)
         {
-            if (_jumpPeak != 0f)
+            if (_onRoof)
+                _isJumping = false;
+
+            if (_isJumping)
             {
                 var distanceLeft = Transform.Position.Y - _jumpPeak;
                 if (distanceLeft <= 20f)
                 {
-                    _jumpPeak = 0f;
+                    _isJumping = false;
+                    _cancelJump = false;
                     return;
+                }
+
+                if (_cancelJump)
+                {
+                    _jumpPeak = Transform.Position.Y - 20f;
+                    distanceLeft = Transform.Position.Y - _jumpPeak;
+                    _cancelJump = false;
                 }
 
                 var newY = -((float) gameTime.ElapsedGameTime.TotalSeconds * distanceLeft * _settings.JumpSpeed);
@@ -100,20 +119,46 @@ namespace conc.game.entity
             var inputManager = Scene.GameManager.Get<InputManager>();
             bool holdingLeft = inputManager.IsDown(ControlButtons.Left, _playerNo);
             bool holdingRight = inputManager.IsDown(ControlButtons.Right, _playerNo);
-            bool holdingJump = inputManager.IsDown(ControlButtons.Jump, _playerNo);
-            var gamescene = Scene as GameScene;
-            if (gamescene != null)
+            if (Scene is GameScene gamescene)
             {
                 var lines = gamescene.CurrentLevel.CollisionLines;
 
+                var roofLine = createTouchSensorLine(BoundingBox.Lines[0], 0.5f);
                 var rightSideLine = createTouchSensorLine(BoundingBox.Lines[1], 0.5f);
-                Line[] footLines = createTouchSensorCrossLines(BoundingBox.Lines[2]);
+                var footLines = createTouchSensorCrossLines(BoundingBox.Lines[2]);
                 var leftSideLine = createTouchSensorLine(BoundingBox.Lines[3], 0.5f);
 
+                _onRoof = lines.Any(l => l.Intersecting(roofLine));
                 _onRightWall = holdingRight && lines.Any(l => l.Intersecting(rightSideLine));
                 _onLeftWall = holdingLeft && lines.Any(l => l.Intersecting(leftSideLine));
                 _currentGround = isSensorTouchingGroundLine(footLines, lines);
                 _onGround = _currentGround != null;
+            }
+        }
+
+        private void updateLevelObjects()
+        {
+            if (Scene is GameScene gameScene)
+            {
+                foreach (var checkpoint in gameScene.CurrentLevel.Checkpoints)
+                {
+                    var boundingRectangle = BoundingBox.Rectangle;
+                    if (_checkpoint != checkpoint && boundingRectangle.Intersects(checkpoint))
+                        _checkpoint = checkpoint;
+                }
+
+                foreach (var death in gameScene.CurrentLevel.Deaths)
+                {
+                    var boundingRectangle = BoundingBox.Rectangle;
+                    if (boundingRectangle.Intersects(death))
+                        IsAlive = false;
+                }
+            }
+
+            if (!IsAlive)
+            {
+                Transform.Position = new Vector2(_checkpoint.X + _checkpoint.Width/2f, _checkpoint.Top);
+                IsAlive = true;
             }
         }
 
@@ -203,15 +248,17 @@ namespace conc.game.entity
             //Jump
             if (inputManager.IsDown(ControlButtons.Jump, _playerNo) && _onGround)
             {
-                _jumpPeak = Transform.Position.Y - 50f;
+                _jumpPeak = Transform.Position.Y - _settings.JumpHeight;
+                _isJumping = true;
                 _onGround = false;
             }
 
-            if (!inputManager.IsDown(ControlButtons.Jump, _playerNo) && !_onGround && _jumpPeak != 0f)
+            if (!inputManager.IsDown(ControlButtons.Jump, _playerNo) && _isJumping)
             {
-                _jumpPeak = 0f;
-                Velocity = new Vector2(Velocity.X, 0f);
+                _cancelJump = true;
             }
         }
+
+        public bool IsAlive { get; private set; }
     }
 }

@@ -73,9 +73,12 @@ namespace conc.game.scenes
 
         private void DrawLevel(SpriteBatch spriteBatch)
         {
-            for (var y = 0; y < _level.Width; y++)
+            var playerX = (int)_player.Transform.Position.X / GameSettings.TileSize;
+            var playerY = (int)_player.Transform.Position.Y / GameSettings.TileSize;
+
+            for (var y = playerY - 25; y <= playerY + 25; y++)
             {
-                for (var x = 0; x < _level.Height; x++)
+                for (var x = playerX - 25; x <= playerX + 25; x++)
                 {
                     if (x < 0 || y < 0 || x >= _level.Width || y >= _level.Height)
                         continue;
@@ -95,8 +98,8 @@ namespace conc.game.scenes
         {
             _entities.Clear();
             _level = level;
-            
-            var tilesetPath = Path.GetFullPath(@"..\..\..\..\content\tiledgenerator\content\");
+
+            var tilesetPath = @"tilesets\";
             _tilesetTextures = new Texture2D[_level.Tilesets.Length];
             for (int i = 0; i < _level.Tilesets.Length; ++i)
             {
@@ -107,7 +110,7 @@ namespace conc.game.scenes
             _animationReader = new AnimationReader();
             _animationReader.LoadAllTemplates();
             
-            _player = new Player(_level.Start, _animationReader.GetAnimator("Player"));
+            _player = new Player(new Vector2(_level.Start.X + _level.Start.Width/2f, _level.Start.Top), _animationReader.GetAnimator("Player"));
             _player.LoadContent(_contentManager);
             AddEntity(_player);
 
