@@ -54,7 +54,7 @@ namespace conc.game.util
             _window.Position = new Point(0, 0);
 
             var width = _manager.GraphicsDevice.DisplayMode.Width; 
-            var height = _manager.GraphicsDevice.DisplayMode.Width;
+            var height = _manager.GraphicsDevice.DisplayMode.Height;
 
             _manager.PreferredBackBufferWidth = width;
             _manager.PreferredBackBufferHeight = height;
