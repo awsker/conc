@@ -18,7 +18,7 @@ namespace conc.game.entity
 
     public class Player : AnimatedEntity, IPlayer
     {
-        private bool _onGround, _onLeftWall, _onRightWall, _onRoof;
+        private bool _onGround, _onLeftWall, _onRightWall;
         private Line _currentGround;
         private readonly PlayerMovementSettings _settings;
         private int _playerNo = 0;
@@ -59,12 +59,21 @@ namespace conc.game.entity
                 _onGround = true;
                 _currentGround = line;
             }
+            if (isLineCeiling(line))
+                _isJumping = false;
+
         }
 
         private bool isLineValidGround(Line line)
         {
             var lineAngle = Vector2.Dot(line.Vector.Normalized(), new Vector2(1f, 0f));
             return lineAngle > 0.707;
+        }
+
+        private bool isLineCeiling(Line line)
+        {
+            var lineAngle = Vector2.Dot(line.Vector.Normalized(), new Vector2(1f, 0f));
+            return lineAngle < -0.999;
         }
 
         public override void Update(GameTime gameTime)
@@ -80,9 +89,6 @@ namespace conc.game.entity
 
         private void updateJump(GameTime gameTime)
         {
-            if (_onRoof)
-                _isJumping = false;
-
             if (_isJumping)
             {
                 var distanceLeft = Transform.Position.Y - _jumpPeak;
@@ -123,12 +129,12 @@ namespace conc.game.entity
             {
                 var lines = gamescene.CurrentLevel.CollisionLines;
 
-                var roofLine = createTouchSensorLine(BoundingBox.Lines[0], 0.5f);
+                //var roofLine = createTouchSensorCrossLines(BoundingBox.Lines[0]);
                 var rightSideLine = createTouchSensorLine(BoundingBox.Lines[1], 0.5f);
                 var footLines = createTouchSensorCrossLines(BoundingBox.Lines[2]);
                 var leftSideLine = createTouchSensorLine(BoundingBox.Lines[3], 0.5f);
 
-                _onRoof = lines.Any(l => l.Intersecting(roofLine));
+                //_onRoof = lines.Any(l => l.Intersecting(roofLine));
                 _onRightWall = holdingRight && lines.Any(l => l.Intersecting(rightSideLine));
                 _onLeftWall = holdingLeft && lines.Any(l => l.Intersecting(leftSideLine));
                 _currentGround = isSensorTouchingGroundLine(footLines, lines);

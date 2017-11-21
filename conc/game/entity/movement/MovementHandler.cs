@@ -14,12 +14,6 @@ namespace conc.game.entity.movement
                 overlappingWithBackground(entity, collisionLines);
 
             var collisionLine = moveEntity(entity, time.ElapsedGameTime.TotalSeconds, collisionLines);
-            /*
-            if (collisionLine != null && entity.ActionOnCollision == ActionOnCollision.PushOut)
-            {
-                var boundingBox = entity.BoundingBox;
-                //overlappingWithLine(boundingBox, entity, collisionLine);
-            }*/
         }
 
         private bool overlappingWithBackground(IMovingEntity entity, Line[] collisionLines)
@@ -110,6 +104,7 @@ namespace conc.game.entity.movement
                         var newVelocity = newVectorVelocity + newNormalVelocity;
                         var fractLeftToMove = shortestDistance / velocity.Length();
                         entity.Velocity = newVelocity;
+                        overlappingWithLine(entity.BoundingBox, entity, closestLine); //Make sure the entity is no longer touching the wall line
                         if (fractLeftToMove > 0.01f)
                         {
                             moveEntity(entity, (float)(totalSeconds * fractLeftToMove), collisionLines);

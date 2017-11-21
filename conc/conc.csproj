@@ -54,8 +54,10 @@
     <Compile Include="game\entity\movement\IMovingEntity.cs" />
     <Compile Include="game\entity\baseclass\Transform.cs" />
     <Compile Include="game\entity\movement\MovementHandler.cs" />
+    <Compile Include="game\entity\NinjaRope.cs" />
     <Compile Include="game\entity\Player.cs" />
     <Compile Include="game\entity\PlayerMovementSettings.cs" />
+    <Compile Include="game\entity\RopeProjectile.cs" />
     <Compile Include="game\GameManager.cs" />
     <Compile Include="game\GameSettings.cs" />
     <Compile Include="game\input\ButtonsContainer.cs" />
