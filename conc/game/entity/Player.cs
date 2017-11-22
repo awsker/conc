@@ -164,6 +164,7 @@ namespace conc.game.entity
             if (!IsAlive)
             {
                 Transform.Position = new Vector2(_checkpoint.X + _checkpoint.Width/2f, _checkpoint.Top);
+                Velocity = Vector2.Zero;
                 IsAlive = true;
             }
         }
