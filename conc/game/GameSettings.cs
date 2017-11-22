@@ -9,5 +9,7 @@
         public static int TargetHeight => 450;
 
         public static int TileSize => 16;
+
+        public static int DrawTileAmount = 30;
     }
 }

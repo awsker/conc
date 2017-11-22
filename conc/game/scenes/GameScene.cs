@@ -75,9 +75,9 @@ namespace conc.game.scenes
             var playerX = (int)_player.Transform.Position.X / GameSettings.TileSize;
             var playerY = (int)_player.Transform.Position.Y / GameSettings.TileSize;
 
-            for (var y = playerY - 25; y <= playerY + 25; y++)
+            for (var y = playerY - GameSettings.DrawTileAmount; y <= playerY + GameSettings.DrawTileAmount; y++)
             {
-                for (var x = playerX - 25; x <= playerX + 25; x++)
+                for (var x = playerX - GameSettings.DrawTileAmount; x <= playerX + GameSettings.DrawTileAmount; x++)
                 {
                     if (x < 0 || y < 0 || x >= _level.Width || y >= _level.Height)
                         continue;
