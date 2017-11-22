@@ -80,14 +80,14 @@ namespace conc.game.entity
         {
             base.Update(gameTime);
 
-            updateJump(gameTime);
+            updateJump();
             updateInAirStatus();
             updateLevelObjects();
             applyGravity(gameTime);
             readInput(gameTime);
         }
 
-        private void updateJump(GameTime gameTime)
+        private void updateJump()
         {
             if (_isJumping)
             {
@@ -106,7 +106,7 @@ namespace conc.game.entity
                     _cancelJump = false;
                 }
 
-                var newY = -((float) gameTime.ElapsedGameTime.TotalSeconds * distanceLeft * _settings.JumpSpeed);
+                var newY = -(distanceLeft * _settings.JumpSpeed)*.005f;
                 Velocity = new Vector2(Velocity.X, newY);
             }
         }
