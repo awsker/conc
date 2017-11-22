@@ -30,7 +30,16 @@ namespace conc.game.scenes.baseclass
             entity.Scene = this;
         }
         public virtual IGameManager GameManager { get; set; }
-        public virtual void Update(GameTime gameTime) { }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            //Remove all destroyed entities
+            for (int i = _entities.Count - 1; i >= 0; --i)
+            {
+                if(_entities[i].IsDestroyed)
+                    _entities.RemoveAt(i);
+            }
+        }
         public virtual void Draw(SpriteBatch spriteBatch) { }
     }
 }

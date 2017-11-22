@@ -112,7 +112,42 @@ namespace tile.math
 
         public bool IntersectingCircle(Vector2 origin, float radius)
         {
-            return DistanceToPoint(origin) <= radius;
+            return IntersectingCircle(origin, radius, out Vector2 temp1, out Vector2 temp2) > 0;
+        }
+
+        public int IntersectingCircle(Vector2 origin, float radius, out Vector2 intersection1, out Vector2 intersection2)
+        {
+            float dx, dy, A, B, C, det, t;
+
+            dx = End.X - Start.X;
+            dy = Start.Y - End.Y;
+
+            A = dx * dx + dy * dy;
+            B = 2 * (dx * (Start.X - origin.X) + dy * (Start.Y - origin.Y));
+            C = (Start.X - origin.X) * (Start.X - origin.X) + (Start.Y - origin.Y) * (Start.Y - origin.Y) - radius * radius;
+
+            det = B * B - 4 * A * C;
+            if (A <= 0.0000001 || det < 0)
+            {
+                // No real solutions.
+                intersection1 = Vector2.Zero;
+                intersection2 = Vector2.Zero;
+                return 0;
+            }
+            if (Math.Abs(det) < double.Epsilon)
+            {
+                // One solution.
+                t = -B / (2 * A);
+                intersection1 = new Vector2(Start.X + t * dx, Start.Y + t * dy);
+                intersection2 = Vector2.Zero;
+                return 1;
+            }
+            // Two solutions.
+            t = (float)((-B + Math.Sqrt(det)) / (2 * A));
+            intersection1 = new Vector2(Start.X + t * dx, Start.Y + t * dy);
+            t = (float)((-B - Math.Sqrt(det)) / (2 * A));
+            intersection2 = new Vector2(Start.X + t * dx, Start.Y + t * dy);
+            return 2;
         }
 
         public bool Intersecting(IPolygon poly)

@@ -44,14 +44,18 @@ namespace conc.game.scenes
 
         public override void Update(GameTime gameTime)
         {
-            foreach (var entity in Entities)
+            base.Update(gameTime);
+
+            for (int i = 0; i < _entities.Count; ++i)
             {
-                entity.Update(gameTime);
+                _entities[i].Update(gameTime);
             }
+
             var movementHandler = new MovementHandler();
-            foreach (var movingEntity in Entities.OfType<IMovingEntity>())
+            for (int i = 0; i < _entities.Count; ++i)
             {
-                movementHandler.HandleMovement(gameTime, movingEntity, _level.CollisionLines);
+                if(_entities[i] is IMovingEntity e)
+                    movementHandler.HandleMovement(gameTime, e, _level.CollisionLines);
             }
 
             _camera.Update(gameTime);

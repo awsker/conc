@@ -22,6 +22,9 @@ namespace conc.game.input
             if (Keyboard.GetState().IsKeyDown(Keys.RightControl))
                 yield return ControlButtons.Jump;
 
+            if (Keyboard.GetState().IsKeyDown(Keys.RightShift))
+                yield return ControlButtons.FireRope;
+
             if (Keyboard.GetState().IsKeyDown(Keys.W))
                 yield return ControlButtons.Up;
 

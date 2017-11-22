@@ -103,6 +103,6 @@ namespace conc.game.input
 
     public enum ControlButtons
     {
-        Left, Right, Up, Down, Jump
+        Left, Right, Up, Down, Jump, FireRope
     }
 }

@@ -27,6 +27,8 @@ namespace conc.game.entity
         private bool _isJumping;
         private bool _cancelJump;
 
+        private IEntity _rope;
+
         private Rectangle _checkpoint;
 
         public Player(Vector2 position, IAnimator animator) : base(position, animator)
@@ -54,14 +56,17 @@ namespace conc.game.entity
 
         public void OnCollisionWithBackground(MovementHandler handler, Vector2 collision, Line line)
         {
-            if(isLineValidGround(line))
+            if (isLineValidGround(line))
             {
                 _onGround = true;
                 _currentGround = line;
             }
             if (isLineCeiling(line))
+            {
                 _isJumping = false;
-
+                _cancelJump = true;
+            }
+            destroyRope();
         }
 
         private bool isLineValidGround(Line line)
@@ -228,6 +233,7 @@ namespace conc.game.entity
             {
                 var directionVector = _currentGround?.Vector.Normalized()* -1 ?? new Vector2(-1f, 0f);
                 Velocity = Vector2.Add(Velocity, directionVector * acceleration);
+                LookDirection = LookDirection.Left;
             }
 
             //Move right
@@ -235,6 +241,7 @@ namespace conc.game.entity
             {
                 var directionVector = _currentGround?.Vector.Normalized() ?? new Vector2(1f, 0f);
                 Velocity = Vector2.Add(Velocity, directionVector * acceleration);
+                LookDirection = LookDirection.Right;
             }
             bool deaccelerate = true; //_onGround;
             //Deaccelerate
@@ -263,8 +270,40 @@ namespace conc.game.entity
             {
                 _cancelJump = true;
             }
+
+            //Fire ninja rope
+            if (inputManager.IsPressed(ControlButtons.FireRope, _playerNo) && (_rope == null || _rope.IsDestroyed))
+            {
+                fireNinjaRope();
+            }
+            //Remove rope when key is let go
+            if (!inputManager.IsDown(ControlButtons.FireRope, _playerNo))
+            {
+                destroyRope();
+            }
+        }
+
+        private void fireNinjaRope()
+        {
+            float speed = 800f;
+            var rope = new RopeProjectile(this, LookDirection);
+            rope.Velocity = new Vector2(speed * (LookDirection == LookDirection.Left ? -1f : 1f), -speed);
+            Scene.AddEntity(rope);
+            _rope = rope;
+        }
+
+        private void destroyRope()
+        {
+            _rope?.Destroy();
         }
 
         public bool IsAlive { get; private set; }
+        public LookDirection LookDirection { get; private set; }
+    }
+
+    public enum LookDirection
+    {
+        Right = 0,
+        Left = 1
     }
 }

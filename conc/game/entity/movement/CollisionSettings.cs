@@ -1,11 +1,11 @@
 ﻿namespace conc.game.entity.movement
 {
-    public struct CollisionSettings
+    public class CollisionSettings
     {
-        public bool CheckCollisionsWithBackground { get; }
-        public ActionOnCollision ActionOnCollision { get; }
-        public float BounceNormal { get; }
-        public float BounceVector { get; }
+        public bool CheckCollisionsWithBackground { get; set; }
+        public ActionOnCollision ActionOnCollision { get; set; }
+        public float BounceNormal { get; set; }
+        public float BounceVector { get; set; }
 
         public CollisionSettings(bool checkCollisions, ActionOnCollision action, float bounceNormal, float bounceVector)
         {

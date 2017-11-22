@@ -13,6 +13,7 @@ namespace conc.game.entity.baseclass
         void LoadContent(ContentManager contentManager);
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
+        void Destroy();
         bool IsVisible { get; }
         bool IsDestroyed { get; }
         int Width { get; }
@@ -63,8 +64,8 @@ namespace conc.game.entity.baseclass
         public virtual void Draw(SpriteBatch spriteBatch)
         {}
 
-        public abstract int Width { get; }
-        public abstract int Height { get; }
+        public virtual int Width => 0;
+        public virtual int Height => 0;
         public virtual Point Offset => Point.Zero;
 
         public virtual Box BoundingBox => new Box(Width, Height) { Scale = Scale, Origin = new Vector2(Offset.X, Offset.Y), Position = Position, Rotation = Rotation };
