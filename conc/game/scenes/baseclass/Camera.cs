@@ -20,12 +20,14 @@ namespace conc.game.scenes.baseclass
 
     public class Camera : ICamera
     {
-        private GraphicsDeviceManager _device;
+        private readonly GraphicsDeviceManager _device;
 
         private readonly float _defaultViewportX = GameSettings.TargetWidth;
         private readonly float _defaultViewportY = GameSettings.TargetHeight;
 
         private IEntity _target;
+
+        private float m_cameraSpeed = 20f;
 
         public Camera(GraphicsDeviceManager device)
         {
@@ -57,9 +59,8 @@ namespace conc.game.scenes.baseclass
         public void Update(GameTime gameTime)
         {
             if (_target != null)
-            {
-                SetPosition(_target.Transform.Position);
-            }
+                Position = Vector2.Lerp(Position, _target.Transform.Position, (float) gameTime.ElapsedGameTime.TotalSeconds * m_cameraSpeed);
+
             var viewportWidth = _device.PreferredBackBufferWidth;
             var viewportHeight = _device.PreferredBackBufferHeight;
 
