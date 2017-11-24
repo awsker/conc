@@ -61,7 +61,7 @@
     <Compile Include="game\entity\Player.cs" />
     <Compile Include="game\entity\PlayerMovementSettings.cs" />
     <Compile Include="game\entity\RopeProjectile.cs" />
-    <Compile Include="game\extensions\RectangleExtensions.cs" />
+    <Compile Include="game\extensions\RectangleExtension.cs" />
     <Compile Include="game\GameManager.cs" />
     <Compile Include="game\GameSettings.cs" />
     <Compile Include="game\input\ButtonsContainer.cs" />
@@ -83,8 +83,8 @@
     <Compile Include="game\scenes\VideoScene.cs" />
     <Compile Include="game\util\ColorManager.cs" />
     <Compile Include="game\util\GameDebug.cs" />
-    <Compile Include="game\util\SpriteBatchExtension.cs" />
-    <Compile Include="game\util\Vector2Extension.cs" />
+    <Compile Include="game\extensions\SpriteBatchExtension.cs" />
+    <Compile Include="game\extensions\Vector2Extension.cs" />
     <Compile Include="game\util\VideoModeManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Program.cs" />

@@ -1,9 +1,8 @@
 ﻿using System;
 using conc.game.entity.baseclass;
 using conc.game.entity.movement;
-using conc.game.util;
+using conc.game.extensions;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using tile.math;
 

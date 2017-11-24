@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using Microsoft.Xna.Framework;
 
-namespace conc.game.util
+namespace conc.game.extensions
 {
     public static class Vector2Extension
     {

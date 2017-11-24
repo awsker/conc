@@ -3,9 +3,9 @@ using System.Linq;
 using conc.game.entity.animation;
 using conc.game.entity.baseclass;
 using conc.game.entity.movement;
+using conc.game.extensions;
 using conc.game.input;
 using conc.game.scenes;
-using conc.game.util;
 using Microsoft.Xna.Framework;
 using tile.math;
 

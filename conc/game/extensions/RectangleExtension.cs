@@ -2,7 +2,7 @@
 
 namespace conc.game.extensions
 {
-    public static class RectangleExtensions
+    public static class RectangleExtension
     {
         public static bool Intersects(this Rectangle rect, Point point)
         {

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace conc.game.util
+namespace conc.game.extensions
 {
     public static class SpriteBatchExtension
     {
