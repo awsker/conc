@@ -5,6 +5,7 @@ using conc.game.scenes.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace conc.game.scenes
 {
@@ -34,12 +35,16 @@ namespace conc.game.scenes
                 new Tuple<string, Command>("Play", new Command(SceneType.Game)),
                 new Tuple<string, Command>("Settings", new Command(SceneType.Settings)),
                 new Tuple<string, Command>("", new Command()),
+                new Tuple<string, Command>("", new Command()),
                 new Tuple<string, Command>("Quit", new Command(CommandType.Quit))
             });
         }
 
         public override void Update(GameTime gameTime)
         {
+            if (_inputManager.IsPressed(Keys.Escape))
+                ExecuteCommand(new Command(CommandType.Quit));
+
             _menu.Update(_inputManager);
         }
 

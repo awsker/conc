@@ -42,6 +42,17 @@ namespace conc.game.input
             return _players[playerIndex].IsPressed(button);
         }
 
+        public bool IsAnyButtonPressed(int playerIndex)
+        {
+            foreach (var button in Enum.GetValues(typeof(ControlButtons)))
+            {
+                if (_players[playerIndex].IsPressed((ControlButtons) button))
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool IsUp(ControlButtons button, int playerIndex)
         {
             return _players[playerIndex].IsUp(button);

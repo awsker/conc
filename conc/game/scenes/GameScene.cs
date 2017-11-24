@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using conc.game.commands;
 using conc.game.entity;
 using conc.game.entity.animation;
 using conc.game.entity.movement;
@@ -8,6 +9,7 @@ using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using tile;
 
 namespace conc.game.scenes
@@ -43,6 +45,9 @@ namespace conc.game.scenes
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+
+            if (_inputManager.IsPressed(Keys.Escape))
+                ExecuteCommand(new Command(SceneType.MainMenu));
 
             for (int i = 0; i < _entities.Count; ++i)
             {

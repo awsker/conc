@@ -5,6 +5,7 @@ using conc.game.scenes.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace conc.game.scenes
 {
@@ -37,6 +38,9 @@ namespace conc.game.scenes
 
         public override void Update(GameTime gameTime)
         {
+            if (_inputManager.IsPressed(Keys.Escape))
+                ExecuteCommand(new Command(SceneType.Settings));
+
             _menu.Update(_inputManager);
         }
 

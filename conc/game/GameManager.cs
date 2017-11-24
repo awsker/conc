@@ -166,11 +166,11 @@ namespace conc.game
         public override void Update(GameTime gameTime)
         {
             _inputManager.Update();
-            if (_inputManager.IsPressed(Keys.Escape))
-            {
-                _game.Exit();
-                return;
-            }
+            //if (_inputManager.IsPressed(Keys.Escape))
+            //{
+            //    _game.Exit();
+            //    return;
+            //}
             
             if (_inputManager.IsPressed(Keys.F11))
                 _videoManager.ToggleFullscreen();
