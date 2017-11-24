@@ -71,13 +71,17 @@ namespace conc.game.scenes.baseclass
         {
             var mousePosition = inputManager.GetMousePosition();
             if (mousePosition != _previousMousePosition)
+            {
                 _controlMode = ControlMode.Mouse;
+                ExecuteCommand?.Invoke(new Command(CommandType.ShowCursor));
+            }
             if (inputManager.IsAnyButtonPressed(0))
             {
                 if (_controlMode == ControlMode.Mouse)
                     _keyboardActivated = true;
 
                 _controlMode = ControlMode.Keyboard;
+                ExecuteCommand?.Invoke(new Command(CommandType.HideCursor));
             }
 
             if (!_keyboardActivated)

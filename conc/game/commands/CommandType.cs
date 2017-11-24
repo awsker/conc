@@ -4,6 +4,8 @@
     {
         Dummy,
         ChangeScene,
-        Quit
+        Quit,
+        ShowCursor,
+        HideCursor
     }
 }

@@ -26,7 +26,7 @@ namespace conc.game
         private readonly Game _game;
         private readonly ContentManager _contentManager;
         private SpriteBatch _spriteBatch;
-        private InputManager _inputManager;
+        private readonly InputManager _inputManager;
         private VideoModeManager _videoManager;
 
         private IScene _scene;
@@ -139,6 +139,12 @@ namespace conc.game
                     break;
                 case CommandType.Quit:
                     _game.Exit();
+                    break;
+                case CommandType.ShowCursor:
+                    _game.IsMouseVisible = true;
+                    break;
+                case CommandType.HideCursor:
+                    _game.IsMouseVisible = false;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
