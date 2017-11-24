@@ -22,7 +22,7 @@ namespace conc.game.input
             if (Keyboard.GetState().IsKeyDown(Keys.RightControl))
                 yield return ControlButtons.Jump;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.RightShift))
+            if (Keyboard.GetState().IsKeyDown(Keys.RightShift) || Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                 yield return ControlButtons.FireRope;
 
             if (Keyboard.GetState().IsKeyDown(Keys.W))

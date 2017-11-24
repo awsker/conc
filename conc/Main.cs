@@ -12,6 +12,8 @@ namespace conc
         {
             var gameManager = new GameManager(this);
             Components.Add(gameManager);
+
+            IsMouseVisible = true;
         }
     }
 }

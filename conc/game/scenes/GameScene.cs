@@ -24,22 +24,20 @@ namespace conc.game.scenes
         private Texture2D[] _tilesetTextures;
         private ICamera _camera;
         private ContentManager _contentManager;
-        private IGameManager _gameManager;
         private InputManager _inputManager;
         private VideoModeManager _videoManager;
         private IPlayer _player;
         private IAnimationReader _animationReader;
 
-        public override IGameManager GameManager
+        public GameScene(GameManager gameManager) : base(gameManager)
         {
-            get { return _gameManager; }
-            set
-            {
-                _gameManager = value;
-                _contentManager = value.Get<ContentManager>();
-                _inputManager = value.Get<InputManager>();
-                _videoManager = value.Get<VideoModeManager>();
-            }
+        }
+
+        public override void LoadContent()
+        {
+            _contentManager = _gameManager.Get<ContentManager>();
+            _inputManager = _gameManager.Get<InputManager>();
+            _videoManager = _gameManager.Get<VideoModeManager>();
         }
 
         public override void Update(GameTime gameTime)

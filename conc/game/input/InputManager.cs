@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace conc.game.input
 {
@@ -8,7 +9,8 @@ namespace conc.game.input
     {
         private PlayerInput[] _players;
         private IDictionary<Keys, uint> _keyboardKeys;
-        
+        private IDictionary<ButtonState, uint> _mouseKeys;
+
         public InputManager(int numPlayers)
         {
             initKeyboardKeys();
@@ -67,6 +69,11 @@ namespace conc.game.input
             return _keyboardKeys[key] == 0;
         }
 
+        public Point GetMousePosition()
+        {
+            return Mouse.GetState().Position;
+        }
+
         private void initPlayerInput(int numPlayers)
         {
             _players = new PlayerInput[numPlayers];
@@ -74,6 +81,7 @@ namespace conc.game.input
                 _players[i] = new PlayerInput(i);
 
             _players[0].InputDevices.Add(new KeyboardInput());
+            _players[0].InputDevices.Add(new MouseInput());
         }
 
         private void initKeyboardKeys()

@@ -16,7 +16,6 @@
 #begin fonts/debug.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/debug.spritefont
 
@@ -79,4 +78,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:trash/x.png
+
+#begin fonts/menu.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:fonts/menu.spritefont
 

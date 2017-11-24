@@ -42,6 +42,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="game\commands\Command.cs" />
+    <Compile Include="game\commands\CommandType.cs" />
     <Compile Include="game\DebugX.cs" />
     <Compile Include="game\entity\animation\Animation.cs" />
     <Compile Include="game\entity\animation\AnimationFrame.cs" />
@@ -59,17 +61,27 @@
     <Compile Include="game\entity\Player.cs" />
     <Compile Include="game\entity\PlayerMovementSettings.cs" />
     <Compile Include="game\entity\RopeProjectile.cs" />
+    <Compile Include="game\extensions\RectangleExtensions.cs" />
     <Compile Include="game\GameManager.cs" />
     <Compile Include="game\GameSettings.cs" />
     <Compile Include="game\input\ButtonsContainer.cs" />
     <Compile Include="game\input\IInputDevice.cs" />
     <Compile Include="game\input\InputManager.cs" />
     <Compile Include="game\input\KeyboardInput.cs" />
+    <Compile Include="game\input\MouseInput.cs" />
     <Compile Include="game\input\PlayerInput.cs" />
     <Compile Include="game\math\Box.cs" />
+    <Compile Include="game\scenes\AudioScene.cs" />
     <Compile Include="game\scenes\baseclass\Camera.cs" />
+    <Compile Include="game\scenes\baseclass\Menu.cs" />
     <Compile Include="game\scenes\baseclass\Scene.cs" />
+    <Compile Include="game\scenes\ControlScene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
+    <Compile Include="game\scenes\MainMenuScene.cs" />
+    <Compile Include="game\scenes\SceneType.cs" />
+    <Compile Include="game\scenes\SettingsScene.cs" />
+    <Compile Include="game\scenes\VideoScene.cs" />
+    <Compile Include="game\util\ColorManager.cs" />
     <Compile Include="game\util\GameDebug.cs" />
     <Compile Include="game\util\SpriteBatchExtension.cs" />
     <Compile Include="game\util\Vector2Extension.cs" />
@@ -139,9 +151,7 @@
       <Name>tile</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="game\extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

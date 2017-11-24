@@ -2,7 +2,7 @@
 
 <Animations>
   
-  <Animator Name="Player" Spritesheet="temp" FrameWidth="16" FrameHeight="16">
+  <Animator Name="Player" Spritesheet="temp" FrameWidth="16" FrameHeight="16" BoundWidth="14" BoundHeight="14">
     <Animation Type="Idle" Playback="1">
       <Frame X="0" Y="0" OffsetX="8" OffsetY="8"/>
     </Animation>

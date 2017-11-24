@@ -9,6 +9,7 @@ using conc.game.util;
 using conc.game.input;
 using tile;
 using System;
+using conc.game.commands;
 
 namespace conc.game
 {
@@ -17,6 +18,7 @@ namespace conc.game
         GraphicsDevice GraphicsDevice { get; }
         T Get<T>();
         void SetScene(IScene scene);
+        void ExecuteCommand(Command command);
     }
 
     public class GameManager : DrawableGameComponent, IGameManager
@@ -78,9 +80,9 @@ namespace conc.game
         {
             if (_inputManager is T)
                 return (T)Convert.ChangeType(_inputManager, typeof(T));
-            else if (_contentManager is T)
+            if (_contentManager is T)
                 return (T)Convert.ChangeType(_contentManager, typeof(T));
-            else if (_videoManager is T)
+            if (_videoManager is T)
                 return (T)Convert.ChangeType(_videoManager, typeof(T));
 
             throw new Exception("No manager found");
@@ -93,8 +95,56 @@ namespace conc.game
         public void SetScene(IScene scene)
         {
             _nextScene = scene;
-            _nextScene.GameManager = this;
+            _nextScene.LoadContent();
         }
+
+        private void setSceneByType(SceneType type)
+        {
+            switch (type)
+            {
+                case SceneType.Game:
+                    var gameScene = new GameScene(this);
+                    gameScene.LoadContent();
+                    gameScene.SetLevel(_levels[0]);
+                    SetScene(gameScene);
+                    break;
+                case SceneType.MainMenu:
+                    SetScene(new MainMenuScene(this));
+                    break;
+                case SceneType.Settings:
+                    SetScene(new SettingsScene(this));
+                    break;
+                case SceneType.Video:
+                    SetScene(new VideoScene(this));
+                    break;
+                case SceneType.Audio:
+                    SetScene(new AudioScene(this));
+                    break;
+                case SceneType.Controls:
+                    SetScene(new ControlScene(this));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public void ExecuteCommand(Command command)
+        {
+            switch (command.CommandType)
+            {
+                case CommandType.Dummy:
+                    break;
+                case CommandType.ChangeScene:
+                    setSceneByType(command.SceneType);
+                    break;
+                case CommandType.Quit:
+                    _game.Exit();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         #endregion
 
         #region GameComponent Overrides 
@@ -104,10 +154,13 @@ namespace conc.game
             _levels = LevelSerializer.DeSerialize();
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
 
-            var gamescene = new GameScene();
-            SetScene(gamescene);
+            //var gamescene = new GameScene();
+            //SetScene(gamescene);
 
-            gamescene.SetLevel(_levels[0]);
+            //gamescene.SetLevel(_levels[0]);
+
+            var menuScene = new MainMenuScene(this);
+            SetScene(menuScene);
         }
         
         public override void Update(GameTime gameTime)

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using conc.game.commands;
 using conc.game.entity.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,7 +10,8 @@ namespace conc.game.scenes.baseclass
 {
     public interface IScene
     {
-        IGameManager GameManager { get; set; }
+        GameManager GameManager { get; }
+        void LoadContent();
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
         void AddEntity(IEntity entity);
@@ -16,11 +19,20 @@ namespace conc.game.scenes.baseclass
 
     public abstract class Scene : IScene
     {
-        protected IList<IEntity> _entities;
-        public Scene()
+        protected readonly GameManager _gameManager;
+
+        protected Scene(GameManager gameManager)
         {
+            _gameManager = gameManager;
             _entities = new List<IEntity>();
         }
+
+        protected void ExecuteCommand(Command command)
+        {
+            _gameManager?.ExecuteCommand(command);
+        }
+
+        protected readonly IList<IEntity> _entities;
 
         protected IReadOnlyCollection<IEntity> Entities => new ReadOnlyCollection<IEntity>(_entities);
 
@@ -29,7 +41,10 @@ namespace conc.game.scenes.baseclass
             _entities.Add(entity);
             entity.Scene = this;
         }
-        public virtual IGameManager GameManager { get; set; }
+
+        public GameManager GameManager => _gameManager;
+
+        public virtual void LoadContent() { }
 
         public virtual void Update(GameTime gameTime)
         {
