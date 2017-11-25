@@ -38,6 +38,8 @@ namespace BGStageGenerator
 
                     var width = int.Parse(doc.DocumentElement.GetAttribute("width"));
                     var height = int.Parse(doc.DocumentElement.GetAttribute("height"));
+                    var tileWidth = int.Parse(doc.DocumentElement.GetAttribute("tilewidth"));
+                    var tileHeight = int.Parse(doc.DocumentElement.GetAttribute("tileheight"));
 
                     var level = new Level
                     {
@@ -45,7 +47,9 @@ namespace BGStageGenerator
                         Background = new ITile[width, height],
                         Foreground = new ITile[width, height],
                         Deaths = new List<Rectangle>(),
-                        Checkpoints = new List<Rectangle>()
+                        Checkpoints = new List<Rectangle>(),
+                        TileWidth = tileWidth, 
+                        TileHeight = tileHeight
                     };
                     CreateTiles(level, doc, width, height, tileSets);
                     CreateObjects(level, doc);

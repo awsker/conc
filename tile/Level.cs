@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
 using tile.math;
@@ -22,6 +23,10 @@ namespace tile
 
         int Width { get; }
         int Height { get; }
+        int TileWidth { get; }
+        int TileHeight { get; }
+
+        IEnumerable<ITile> GetPotentialCollisionTiles(Rectangle boundingBox);
     }
 
     [DataContract(Name = "Level")]
@@ -66,6 +71,18 @@ namespace tile
 
         public int Width => Tiles.GetLength(0);
         public int Height => Tiles.GetLength(1);
+
+        [DataMember]
+        public int TileWidth { get; set; }
+        [DataMember]
+        public int TileHeight { get; set; }
+
+        public IEnumerable<ITile> GetPotentialCollisionTiles(Rectangle boundingBox)
+        {
+            for (int x = Math.Max(0, boundingBox.X / TileWidth); x <= (boundingBox.X + boundingBox.Width) / TileWidth && x < Width; ++x)
+                for (int y = Math.Max(0, boundingBox.Y / TileHeight); y <= (boundingBox.Y + boundingBox.Height) / TileHeight && x < Height; ++y)
+                    yield return Tiles[x, y];
+        }
 
         [OnSerializing]
         public void BeforeSerializing(StreamingContext ctx)

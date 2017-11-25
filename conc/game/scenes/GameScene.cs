@@ -54,11 +54,11 @@ namespace conc.game.scenes
                 _entities[i].Update(gameTime);
             }
 
-            var movementHandler = new MovementHandler();
+            IMovementHandler movementHandler = new MovementHandler();
             for (int i = 0; i < _entities.Count; ++i)
             {
                 if(_entities[i] is IMovingEntity e)
-                    movementHandler.HandleMovement(gameTime, e, _level.CollisionLines);
+                    movementHandler.HandleMovement(gameTime, e, _level);
             }
 
             _camera.Update(gameTime);

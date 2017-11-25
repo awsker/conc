@@ -27,7 +27,12 @@ namespace conc.game.entity
         private bool _isJumping;
         private bool _cancelJump;
 
-        private IEntity _rope;
+        private int _doubleJumpsRemaining;
+        private GameTime _lastGroundTouch;
+        private GameTime _lastJump;
+        private bool _hasJumpedThisPress;
+
+        private RopeProjectile _rope;
 
         private Rectangle _checkpoint;
 
@@ -36,15 +41,17 @@ namespace conc.game.entity
             CollisionSettings = new CollisionSettings(true, ActionOnCollision.PushOut, 0f, 1f);
             _settings = new PlayerMovementSettings
             {
-                Acceleration = 1000f,
-                Deacceleration = 1000f,
-                JumpSpeed = 500f,
+                Acceleration = 800f,
+                Deacceleration = 800f,
+                JumpSpeed = 600f,
                 JumpHeight = 75f,
                 MaxSpeed = 200f,
-                Gravity = 300f,
+                Gravity = 400f,
                 TerminalVelocity = 800f,
                 InAirAccelerationFactor = .7f,
-                InAirDeaccelerationFactor = .7f
+                InAirDeaccelerationFactor = .7f,
+                JumpTimeSlack = TimeSpan.FromMilliseconds(100), //100 milliseconds of Wile E. Coyote time
+                WallSlideMaxDownSpeed = 75f
             };
 
             if (Scene is GameScene gameScene)
@@ -54,19 +61,14 @@ namespace conc.game.entity
         public Vector2 Velocity { get; set; }
         public CollisionSettings CollisionSettings { get; }
 
-        public void OnCollisionWithBackground(MovementHandler handler, Vector2 collision, Line line)
+        public void OnCollisionWithBackground(IMovementHandler handler, Vector2 collision, Line line)
         {
-            if (isLineValidGround(line))
-            {
-                _onGround = true;
-                _currentGround = line;
-            }
             if (isLineCeiling(line))
             {
                 _isJumping = false;
                 _cancelJump = true;
             }
-            destroyRope();
+            retractRope();
         }
 
         private bool isLineValidGround(Line line)
@@ -86,9 +88,10 @@ namespace conc.game.entity
             base.Update(gameTime);
 
             updateJump();
-            updateInAirStatus();
+            updateInAirStatus(gameTime);
             updateLevelObjects();
             applyGravity(gameTime);
+            applyWallSlideDeacceleration(gameTime);
             readInput(gameTime);
         }
 
@@ -125,7 +128,7 @@ namespace conc.game.entity
             }
         }
 
-        private void updateInAirStatus()
+        private void updateInAirStatus(GameTime gametime)
         {
             var inputManager = Scene.GameManager.Get<InputManager>();
             bool holdingLeft = inputManager.IsDown(ControlButtons.Left, _playerNo);
@@ -134,17 +137,47 @@ namespace conc.game.entity
             {
                 var lines = gamescene.CurrentLevel.CollisionLines;
 
-                //var roofLine = createTouchSensorCrossLines(BoundingBox.Lines[0]);
                 var rightSideLine = createTouchSensorLine(BoundingBox.Lines[1], 0.5f);
                 var footLines = createTouchSensorCrossLines(BoundingBox.Lines[2]);
                 var leftSideLine = createTouchSensorLine(BoundingBox.Lines[3], 0.5f);
 
                 //_onRoof = lines.Any(l => l.Intersecting(roofLine));
-                _onRightWall = holdingRight && lines.Any(l => l.Intersecting(rightSideLine));
-                _onLeftWall = holdingLeft && lines.Any(l => l.Intersecting(leftSideLine));
+                _onRightWall = /*holdingRight &&*/ lines.Any(l => l.Intersecting(rightSideLine));
+                _onLeftWall = /*holdingLeft &&*/ lines.Any(l => l.Intersecting(leftSideLine));
                 _currentGround = isSensorTouchingGroundLine(footLines, lines);
                 _onGround = _currentGround != null;
+
+                if (isTouchingJumpableGround(gametime))
+                {
+                    _lastGroundTouch = new GameTime(gametime.TotalGameTime, gametime.ElapsedGameTime);
+                    _doubleJumpsRemaining = 1;
+                }
+                if (_rope != null && _rope.IsHooked())
+                {
+                    _doubleJumpsRemaining = 1;
+                }
             }
+        }
+
+        private void applyWallSlideDeacceleration(GameTime gameTime)
+        {
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var deacceleration = _settings.Deacceleration * (_onGround ? 1f : _settings.InAirDeaccelerationFactor) * dt;
+            if (isClingingToWall() && Velocity.Y > _settings.WallSlideMaxDownSpeed)
+            {
+                Velocity = new Vector2(Velocity.X, Math.Max(Velocity.Y - deacceleration, _settings.WallSlideMaxDownSpeed));
+            }
+        }
+        
+        private bool isTouchingJumpableGround(GameTime time)
+        {
+            var enoughTimePassedSinceLastJump = _lastJump == null || time.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
+            return enoughTimePassedSinceLastJump && (_onRightWall || _onLeftWall || _onGround);
+        }
+
+        private bool isClingingToWall()
+        {
+            return !_onGround && (_onLeftWall || _onRightWall);
         }
 
         private void updateLevelObjects()
@@ -172,6 +205,14 @@ namespace conc.game.entity
                 Velocity = Vector2.Zero;
                 IsAlive = true;
             }
+        }
+
+        private bool canJump(GameTime time)
+        {
+            var enoughTimePassedSinceLastJump = _lastJump == null || time.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
+            return enoughTimePassedSinceLastJump && 
+                (time.TotalGameTime - _lastGroundTouch.TotalGameTime <= _settings.JumpTimeSlack ||
+                _doubleJumpsRemaining > 0);
         }
 
         private Line createTouchSensorLine(Line side, float placeOnLine)
@@ -230,19 +271,24 @@ namespace conc.game.entity
             }
             
             //Move left
-            if (inputManager.IsDown(ControlButtons.Left, _playerNo) && !inputManager.IsDown(ControlButtons.Right, _playerNo) && Velocity.X > -maxSpeedX)
+            if (inputManager.IsDown(ControlButtons.Left, _playerNo))
             {
-                var directionVector = _currentGround?.Vector.Normalized()* -1 ?? new Vector2(-1f, 0f);
-                Velocity = Vector2.Add(Velocity, directionVector * acceleration);
                 LookDirection = LookDirection.Left;
+                if (!inputManager.IsDown(ControlButtons.Right, _playerNo) && Velocity.X > -maxSpeedX)
+                {
+                    var directionVector = _currentGround?.Vector.Normalized() * -1 ?? new Vector2(-1f, 0f);
+                    Velocity = Vector2.Add(Velocity, directionVector * acceleration);
+                }
             }
-
             //Move right
-            if (inputManager.IsDown(ControlButtons.Right, _playerNo) && !inputManager.IsDown(ControlButtons.Left, _playerNo) && Velocity.X < maxSpeedX)
+            if (inputManager.IsDown(ControlButtons.Right, _playerNo))
             {
-                var directionVector = _currentGround?.Vector.Normalized() ?? new Vector2(1f, 0f);
-                Velocity = Vector2.Add(Velocity, directionVector * acceleration);
                 LookDirection = LookDirection.Right;
+                if (!inputManager.IsDown(ControlButtons.Left, _playerNo) && Velocity.X < maxSpeedX)
+                {
+                    var directionVector = _currentGround?.Vector.Normalized() ?? new Vector2(1f, 0f);
+                    Velocity = Vector2.Add(Velocity, directionVector * acceleration);
+                }
             }
             bool deaccelerate = true; //_onGround;
             //Deaccelerate
@@ -259,12 +305,15 @@ namespace conc.game.entity
                 Velocity = stopX ? new Vector2(0, stopY ? 0 : Velocity.Y) : Vector2.Add(Velocity, deaccVector);
             }
 
-            //Jump
-            if (inputManager.IsDown(ControlButtons.Jump, _playerNo) && _onGround)
+            //Jump - If holding key and (ground)jump has not been performed on the current press, or if button was just pressed
+            if (inputManager.IsDown(ControlButtons.Jump, _playerNo) && !_hasJumpedThisPress ||
+                inputManager.IsPressed(ControlButtons.Jump, _playerNo))
             {
-                _jumpPeak = Transform.Position.Y - _settings.JumpHeight;
-                _isJumping = true;
-                _onGround = false;
+                jump(gameTime);
+            }
+            if (!inputManager.IsDown(ControlButtons.Jump, _playerNo))
+            {
+                _hasJumpedThisPress = false;
             }
 
             if (!inputManager.IsDown(ControlButtons.Jump, _playerNo) && _isJumping)
@@ -280,22 +329,43 @@ namespace conc.game.entity
             //Remove rope when key is let go
             if (!inputManager.IsDown(ControlButtons.FireRope, _playerNo))
             {
-                destroyRope();
+                retractRope();
             }
         }
 
+        private void jump(GameTime currentTime)
+        {
+            if (canJump(currentTime))
+            {
+                if (currentTime.TotalGameTime - _lastGroundTouch.TotalGameTime > _settings.JumpTimeSlack)
+                    --_doubleJumpsRemaining;
+                
+                _hasJumpedThisPress = true;
+                _jumpPeak = Transform.Position.Y - _settings.JumpHeight;
+                if (isClingingToWall())
+                {
+                    if(_onLeftWall && !_onRightWall)
+                        Velocity = new Vector2(_settings.JumpSpeed * 0.4f, Velocity.Y);
+                    if(_onRightWall && !_onLeftWall)
+                        Velocity = new Vector2(-_settings.JumpSpeed * 0.4f, Velocity.Y);
+                }
+                _isJumping = true;
+                _onGround = false;
+                _lastJump = new GameTime(currentTime.TotalGameTime, currentTime.ElapsedGameTime);
+            }
+        }
+
+        
         private void fireNinjaRope()
         {
-            float speed = 800f;
             var rope = new RopeProjectile(this, LookDirection);
-            rope.Velocity = new Vector2(speed * (LookDirection == LookDirection.Left ? -1f : 1f), -speed);
             Scene.AddEntity(rope);
             _rope = rope;
         }
 
-        private void destroyRope()
+        private void retractRope()
         {
-            _rope?.Destroy();
+            _rope?.Retract();
         }
 
         public bool IsAlive { get; private set; }
