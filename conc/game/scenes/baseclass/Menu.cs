@@ -75,7 +75,7 @@ namespace conc.game.scenes.baseclass
                 _controlMode = ControlMode.Mouse;
                 ExecuteCommand?.Invoke(new Command(CommandType.ShowCursor));
             }
-            if (inputManager.IsAnyButtonPressed(0))
+            else if (inputManager.IsAnyButtonPressed(0))
             {
                 if (_controlMode == ControlMode.Mouse)
                     _keyboardActivated = true;

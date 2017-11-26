@@ -28,6 +28,7 @@ namespace conc.game
         private SpriteBatch _spriteBatch;
         private readonly InputManager _inputManager;
         private VideoModeManager _videoManager;
+        private ColorManager _colorManager;
 
         private IScene _scene;
         private IScene _nextScene;
@@ -84,6 +85,8 @@ namespace conc.game
                 return (T)Convert.ChangeType(_contentManager, typeof(T));
             if (_videoManager is T)
                 return (T)Convert.ChangeType(_videoManager, typeof(T));
+            if (_colorManager is T)
+                return (T)Convert.ChangeType(_colorManager, typeof(T));
 
             throw new Exception("No manager found");
         }
@@ -159,14 +162,18 @@ namespace conc.game
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _levels = LevelSerializer.DeSerialize();
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
-
+            _colorManager = new ColorManager(GraphicsDevice);
+            
             //var gamescene = new GameScene();
             //SetScene(gamescene);
 
             //gamescene.SetLevel(_levels[0]);
 
-            var menuScene = new MainMenuScene(this);
-            SetScene(menuScene);
+            //var menuScene = new MainMenuScene(this);
+            //SetScene(menuScene);
+
+            var audioScene = new AudioScene(this);
+            SetScene(audioScene);
         }
         
         public override void Update(GameTime gameTime)

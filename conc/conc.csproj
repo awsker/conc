@@ -64,6 +64,9 @@
     <Compile Include="game\extensions\RectangleExtension.cs" />
     <Compile Include="game\GameManager.cs" />
     <Compile Include="game\GameSettings.cs" />
+    <Compile Include="game\gui\baseclass\GuiComponent.cs" />
+    <Compile Include="game\gui\Label.cs" />
+    <Compile Include="game\gui\Panel.cs" />
     <Compile Include="game\input\ButtonsContainer.cs" />
     <Compile Include="game\input\IInputDevice.cs" />
     <Compile Include="game\input\InputManager.cs" />
@@ -75,6 +78,8 @@
     <Compile Include="game\scenes\baseclass\Camera.cs" />
     <Compile Include="game\scenes\baseclass\Menu.cs" />
     <Compile Include="game\scenes\baseclass\Scene.cs" />
+    <Compile Include="game\gui\components\ComboBoxComponent.cs" />
+    <Compile Include="game\gui\components\SliderComponent.cs" />
     <Compile Include="game\scenes\ControlScene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
     <Compile Include="game\scenes\MainMenuScene.cs" />
