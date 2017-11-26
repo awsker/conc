@@ -19,6 +19,8 @@ namespace conc.game.entity
         private float _distance;
         private float _velocity;
 
+        private bool _retracting;
+
         public NinjaRope(Vector2 position, IMovingEntity owner, LookDirection spinDirection)
         {
             Position = position;
@@ -31,27 +33,21 @@ namespace conc.game.entity
 
         public override void Update(GameTime gameTime)
         {
-            var line = new Line(_owner.Transform.Position, Position);
-            if (line.Length > _distance)
+            if (!_retracting)
             {
-                _owner.Transform.Position = Position + (line.Start - line.End).Normalized() * _distance;
+                var line = new Line(_owner.Transform.Position, Position);
+                if (line.Length > _distance)
+                {
+                    _owner.Transform.Position = Position + (line.Start - line.End).Normalized() * _distance;
+                }
+                var sign = _direction == LookDirection.Right ? -1f : 1f;
+                _owner.Velocity = line.Normal * sign * _velocity;
             }
-            var sign = _direction == LookDirection.Right ? -1f : 1f;
-            _owner.Velocity = line.Normal * sign * _velocity;
-            
         }
 
-
-        public override void Draw(SpriteBatch spriteBatch)
+        public void Retract()
         {
-            base.Draw(spriteBatch);
-        }
-
-        public override void Destroy()
-        {
-            base.Destroy();
-            //Destroy all chain pieces as well
-
+            _retracting = true;
         }
 
         private float distanceToOwner()

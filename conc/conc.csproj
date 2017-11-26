@@ -54,8 +54,10 @@
     <Compile Include="game\entity\baseclass\AnimatedEntity.cs" />
     <Compile Include="game\entity\baseclass\Entity.cs" />
     <Compile Include="game\entity\movement\CollisionSettings.cs" />
+    <Compile Include="game\entity\movement\IMovementHandler.cs" />
     <Compile Include="game\entity\movement\IMovingEntity.cs" />
     <Compile Include="game\entity\baseclass\Transform.cs" />
+    <Compile Include="game\entity\movement\IntMovementHandler.cs" />
     <Compile Include="game\entity\movement\MovementHandler.cs" />
     <Compile Include="game\entity\NinjaRope.cs" />
     <Compile Include="game\entity\Player.cs" />

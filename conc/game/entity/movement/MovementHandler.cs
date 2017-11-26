@@ -2,18 +2,19 @@
 using conc.game.extensions;
 using conc.game.math;
 using Microsoft.Xna.Framework;
+using tile;
 using tile.math;
 
 namespace conc.game.entity.movement
 {
-    public class MovementHandler
+    public class MovementHandler : IMovementHandler
     {
-        public void HandleMovement(GameTime time, IMovingEntity entity, Line[] collisionLines)
+        public void HandleMovement(GameTime time, IMovingEntity entity, ILevel level)
         {
             if (entity.CollisionSettings.CheckCollisionsWithBackground)
-                overlappingWithBackground(entity, collisionLines);
+                overlappingWithBackground(entity, level.CollisionLines);
 
-            var collisionLine = moveEntity(entity, time.ElapsedGameTime.TotalSeconds, collisionLines);
+            var collisionLine = moveEntity(entity, time.ElapsedGameTime.TotalSeconds, level.CollisionLines);
         }
 
         private bool overlappingWithBackground(IMovingEntity entity, Line[] collisionLines)

@@ -9,7 +9,7 @@ namespace conc.game.input
     {
         private PlayerInput[] _players;
         private IDictionary<Keys, uint> _keyboardKeys;
-        private IDictionary<ButtonState, uint> _mouseKeys;
+        //private IDictionary<ButtonState, uint> _mouseKeys;
 
         public InputManager(int numPlayers)
         {

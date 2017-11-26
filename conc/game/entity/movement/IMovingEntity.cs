@@ -7,7 +7,7 @@ namespace conc.game.entity.movement
     public interface IMovingEntity : IEntity
     {
         Vector2 Velocity { get; set; }
-        void OnCollisionWithBackground(MovementHandler handler, Vector2 collision, Line line);
+        void OnCollisionWithBackground(IMovementHandler handler, Vector2 collision, Line line);
         CollisionSettings CollisionSettings { get; }
     }
 }
