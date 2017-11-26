@@ -36,6 +36,12 @@ namespace conc.game.util
             return value;
         }
 
+        public static Point Log(string title, Point value)
+        {
+            Messages.Add($"{title}: X={value.X:0.00}, Y={value.Y:0.00}");
+            return value;
+        }
+
         public static Vector3 Log(string title, Vector3 value)
         {
             Messages.Add($"{title}: X={value.X:0.00}, Y={value.Y:0.00}, Z={value.Z:0:00}");

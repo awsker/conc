@@ -4,12 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace conc.game.util
 {
-    public interface IColorManager
-    {
-        Texture2D Get(Color color);
-    }
-    
-    public class ColorManager : IColorManager
+    public class ColorManager
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly Dictionary<Color, Texture2D> _cache;
@@ -23,7 +18,11 @@ namespace conc.game.util
         public Texture2D Get(Color color)
         {
             if (!_cache.ContainsKey(color))
-                _cache[color] = new Texture2D(_graphicsDevice, 1, 1);
+            {
+                var texture = new Texture2D(_graphicsDevice, 1, 1);
+                texture.SetData(new[] {color});
+                _cache[color] = texture;
+            }
 
             return _cache[color];
         }

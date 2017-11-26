@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using conc.game.commands;
 using conc.game.entity.baseclass;
+using conc.game.gui.baseclass;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,6 +16,7 @@ namespace conc.game.scenes.baseclass
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
         void AddEntity(IEntity entity);
+        IList<IGuiComponent> GuiComponents { get; }
     }
 
     public abstract class Scene : IScene
@@ -26,6 +27,8 @@ namespace conc.game.scenes.baseclass
         {
             _gameManager = gameManager;
             _entities = new List<IEntity>();
+
+            GuiComponents = new List<IGuiComponent>();
         }
 
         protected void ExecuteCommand(Command command)
@@ -43,6 +46,8 @@ namespace conc.game.scenes.baseclass
             entity.Scene = this;
             entity.LoadContent(_gameManager.Get<ContentManager>());
         }
+
+        public IList<IGuiComponent> GuiComponents { get; }
 
         public GameManager GameManager => _gameManager;
 

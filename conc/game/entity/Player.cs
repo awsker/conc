@@ -353,6 +353,7 @@ namespace conc.game.entity
                         Velocity = new Vector2(-_settings.JumpSpeed * 0.4f, Velocity.Y);
                 }
                 _isJumping = true;
+                _cancelJump = false;
                 _onGround = false;
                 _lastJump = new GameTime(currentTime.TotalGameTime, currentTime.ElapsedGameTime);
             }
