@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using conc.game.entity.animation;
 using conc.game.entity.baseclass;
@@ -8,6 +9,7 @@ using conc.game.input;
 using conc.game.scenes;
 using conc.game.util;
 using Microsoft.Xna.Framework;
+using tile;
 using tile.math;
 
 namespace conc.game.entity
@@ -29,9 +31,10 @@ namespace conc.game.entity
         private bool _cancelJump;
 
         private int _doubleJumpsRemaining;
-        private GameTime _lastGroundTouch;
+        private GameTime _lastTouchGround, _lastTouchLeftWall, _lastTouchRightWall;
         private GameTime _lastJump;
         private bool _hasJumpedThisPress;
+        private bool _hasFiredRopeThisPress;
 
         private RopeProjectile _rope;
 
@@ -52,7 +55,8 @@ namespace conc.game.entity
                 InAirAccelerationFactor = .7f,
                 InAirDeaccelerationFactor = .7f,
                 JumpTimeSlack = TimeSpan.FromMilliseconds(100), //100 milliseconds of Wile E. Coyote time
-                WallSlideMaxDownSpeed = 75f
+                WallSlideMaxDownSpeed = 75f,
+                NumDoubleJumps = 1
             };
 
             if (Scene is GameScene gameScene)
@@ -81,7 +85,13 @@ namespace conc.game.entity
         private bool isLineCeiling(Line line)
         {
             var lineAngle = Vector2.Dot(line.Vector.Normalized(), new Vector2(1f, 0f));
-            return lineAngle < -0.999;
+            return lineAngle < -0.707;
+        }
+
+        private bool isValidWall(Line line)
+        {
+            var lineAngle = Vector2.Dot(line.Vector.Normalized(), new Vector2(1f, 0f));
+            return Math.Abs(lineAngle) < 0.01f;
         }
 
         public override void Update(GameTime gameTime)
@@ -138,46 +148,68 @@ namespace conc.game.entity
             bool holdingRight = inputManager.IsDown(ControlButtons.Right, _playerNo);
             if (Scene is GameScene gamescene)
             {
-                var lines = gamescene.CurrentLevel.CollisionLines;
-
                 var rightSideLine = createTouchSensorLine(BoundingBox.Lines[1], 0.5f);
                 var footLines = createTouchSensorCrossLines(BoundingBox.Lines[2]);
                 var leftSideLine = createTouchSensorLine(BoundingBox.Lines[3], 0.5f);
 
                 //_onRoof = lines.Any(l => l.Intersecting(roofLine));
-                _onRightWall = /*holdingRight &&*/ lines.Any(l => l.Intersecting(rightSideLine));
-                _onLeftWall = /*holdingLeft &&*/ lines.Any(l => l.Intersecting(leftSideLine));
-                _currentGround = isSensorTouchingGroundLine(footLines, lines);
+                _onRightWall = holdingRight && intersectsLevel(rightSideLine, gamescene.CurrentLevel, isValidWall);
+                _onLeftWall = holdingLeft && intersectsLevel(leftSideLine, gamescene.CurrentLevel, isValidWall);
+                _currentGround = isSensorTouchingGroundLine(footLines, gamescene.CurrentLevel);
                 _onGround = _currentGround != null;
 
-                if (isTouchingJumpableGround(gametime))
+                if (_onGround)
                 {
-                    _lastGroundTouch = new GameTime(gametime.TotalGameTime, gametime.ElapsedGameTime);
-                    _doubleJumpsRemaining = 1;
+                    _lastTouchGround = new GameTime(gametime.TotalGameTime, gametime.ElapsedGameTime);
+                    resetDoubleJumps();
+                }
+                if (_onRightWall)
+                {
+                    _lastTouchRightWall = new GameTime(gametime.TotalGameTime, gametime.ElapsedGameTime);
+                    resetDoubleJumps();
+                }
+                if (_onLeftWall)
+                {
+                    _lastTouchLeftWall = new GameTime(gametime.TotalGameTime, gametime.ElapsedGameTime);
+                    resetDoubleJumps();
                 }
                 if (_rope != null && _rope.IsHooked())
                 {
-                    _doubleJumpsRemaining = 1;
+                    resetDoubleJumps();
                 }
             }
+        }
+
+        private void resetDoubleJumps()
+        {
+            _doubleJumpsRemaining = _settings.NumDoubleJumps;
+        }
+
+        private bool intersectsLevel(IEnumerable<Line> lines, ILevel level)
+        {
+            return lines.Any(line => intersectsLevel(line, level));
+        }
+        
+        private bool intersectsLevel(Line line, ILevel level)
+        {
+            return level.GetPotentialCollisionLines(line).Any(levelLine => levelLine.Intersecting(line));
+        }
+
+        private bool intersectsLevel(Line line, ILevel level, Predicate<Line> levelLinePredicate)
+        {
+            return level.GetPotentialCollisionLines(line).Any(levelLine => levelLine.Intersecting(line) && levelLinePredicate(levelLine));
         }
 
         private void applyWallSlideDeacceleration(GameTime gameTime)
         {
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            var deacceleration = _settings.Deacceleration * (_onGround ? 1f : _settings.InAirDeaccelerationFactor) * dt;
+            var deacceleration = _settings.Deacceleration * dt;
             if (isClingingToWall() && Velocity.Y > _settings.WallSlideMaxDownSpeed)
             {
                 Velocity = new Vector2(Velocity.X, Math.Max(Velocity.Y - deacceleration, _settings.WallSlideMaxDownSpeed));
             }
         }
         
-        private bool isTouchingJumpableGround(GameTime time)
-        {
-            var enoughTimePassedSinceLastJump = _lastJump == null || time.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
-            return enoughTimePassedSinceLastJump && (_onRightWall || _onLeftWall || _onGround);
-        }
-
         private bool isClingingToWall()
         {
             return !_onGround && (_onLeftWall || _onRightWall);
@@ -214,7 +246,7 @@ namespace conc.game.entity
         {
             var enoughTimePassedSinceLastJump = _lastJump == null || time.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
             return enoughTimePassedSinceLastJump && 
-                (time.TotalGameTime - _lastGroundTouch.TotalGameTime <= _settings.JumpTimeSlack ||
+                (_lastTouchGround != null && time.TotalGameTime - _lastTouchGround.TotalGameTime <= _settings.JumpTimeSlack ||
                 _doubleJumpsRemaining > 0);
         }
 
@@ -232,20 +264,20 @@ namespace conc.game.entity
             return lines;
         }
 
-        private Line isSensorTouchingGroundLine(Line[] sensors, Line[] groundLines)
+        private Line isSensorTouchingGroundLine(Line[] sensors, ILevel level)
         {
-            var linesToSearch = groundLines.Where(isLineValidGround);
             Line bestLine = null;
             float lowestY = 0;
             float lowestYsHighestY = 0;
-            foreach (var gl in linesToSearch)
+            foreach (var sensor in sensors)
             {
-                var glLowestY = Math.Min(gl.Start.Y, gl.End.Y);
-                var glHighestY = Math.Max(gl.Start.Y, gl.End.Y);
-                if (bestLine != null && lowestY < glLowestY) //Skip line if we've already touched a line higher up than this
-                    continue;
-                foreach (var sensor in sensors)
+                foreach (var gl in level.GetPotentialCollisionLines(sensor))
                 {
+                    var glLowestY = Math.Min(gl.Start.Y, gl.End.Y);
+                    var glHighestY = Math.Max(gl.Start.Y, gl.End.Y);
+                    if (bestLine != null && lowestY < glLowestY) //Skip line if we've already touched a line higher up than this
+                        continue;
+
                     if (sensor.Intersecting(gl) && (bestLine == null || glLowestY < lowestY || glLowestY.Equals(lowestY) && glHighestY < lowestYsHighestY))
                     {
                         bestLine = gl;
@@ -312,7 +344,7 @@ namespace conc.game.entity
             if (inputManager.IsDown(ControlButtons.Jump, _playerNo) && !_hasJumpedThisPress ||
                 inputManager.IsPressed(ControlButtons.Jump, _playerNo))
             {
-                jump(gameTime);
+                tryJump(gameTime);
             }
             if (!inputManager.IsDown(ControlButtons.Jump, _playerNo))
             {
@@ -325,9 +357,13 @@ namespace conc.game.entity
             }
 
             //Fire ninja rope
-            if (inputManager.IsPressed(ControlButtons.FireRope, _playerNo) && (_rope == null || _rope.IsDestroyed))
+            if (inputManager.IsDown(ControlButtons.FireRope, _playerNo) && (_rope == null || _rope.IsDestroyed) && !_hasFiredRopeThisPress)
             {
                 fireNinjaRope();
+            }
+            if (!inputManager.IsDown(ControlButtons.FireRope, _playerNo))
+            {
+                _hasFiredRopeThisPress = false;
             }
             //Remove rope when key is let go
             if (!inputManager.IsDown(ControlButtons.FireRope, _playerNo))
@@ -336,32 +372,53 @@ namespace conc.game.entity
             }
         }
 
-        private void jump(GameTime currentTime)
+        private bool tryJump(GameTime currentTime)
         {
-            if (canJump(currentTime))
+            var enoughTimePassedSinceLastJump = _lastJump == null || currentTime.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
+            if (!enoughTimePassedSinceLastJump)
+                return false;
+
+            //Prioritize normal jumps before wall jumps
+            if (_lastTouchGround != null && currentTime.TotalGameTime - _lastTouchGround.TotalGameTime <= _settings.JumpTimeSlack)
             {
-                if (currentTime.TotalGameTime - _lastGroundTouch.TotalGameTime > _settings.JumpTimeSlack)
-                    --_doubleJumpsRemaining;
-                
-                _hasJumpedThisPress = true;
-                _jumpPeak = Transform.Position.Y - _settings.JumpHeight;
-                if (isClingingToWall())
-                {
-                    if(_onLeftWall && !_onRightWall)
-                        Velocity = new Vector2(_settings.JumpSpeed * 0.4f, Velocity.Y);
-                    if(_onRightWall && !_onLeftWall)
-                        Velocity = new Vector2(-_settings.JumpSpeed * 0.4f, Velocity.Y);
-                }
-                _isJumping = true;
-                _cancelJump = false;
-                _onGround = false;
-                _lastJump = new GameTime(currentTime.TotalGameTime, currentTime.ElapsedGameTime);
+                jump(currentTime);
+                return true;
             }
+            if (_lastTouchLeftWall != null && currentTime.TotalGameTime - _lastTouchLeftWall.TotalGameTime <= _settings.JumpTimeSlack)
+            {
+                jump(currentTime);
+                Velocity = new Vector2(_settings.JumpSpeed * 0.25f, Velocity.Y);
+                return true;
+            }
+            if (_lastTouchRightWall != null && currentTime.TotalGameTime - _lastTouchRightWall.TotalGameTime <= _settings.JumpTimeSlack)
+            {
+                jump(currentTime);
+                Velocity = new Vector2(-_settings.JumpSpeed * 0.25f, Velocity.Y);
+                return true;
+            }
+            if (_doubleJumpsRemaining > 0)
+            {
+                jump(currentTime);
+                return true;
+            }
+            return false;
         }
 
+        private void jump(GameTime currentTime)
+        {
+            if (currentTime.TotalGameTime - _lastTouchGround.TotalGameTime > _settings.JumpTimeSlack)
+                --_doubleJumpsRemaining;
+
+            _hasJumpedThisPress = true;
+            _jumpPeak = Transform.Position.Y - _settings.JumpHeight;
+            _isJumping = true;
+            _cancelJump = false;
+            _lastJump = new GameTime(currentTime.TotalGameTime, currentTime.ElapsedGameTime);
+        }
         
         private void fireNinjaRope()
         {
+            _hasFiredRopeThisPress = true;
             var rope = new RopeProjectile(this, LookDirection);
             Scene.AddEntity(rope);
             _rope = rope;

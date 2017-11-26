@@ -26,7 +26,8 @@ namespace tile
         int TileWidth { get; }
         int TileHeight { get; }
 
-        IEnumerable<ITile> GetPotentialCollisionTiles(Rectangle boundingBox);
+        //IEnumerable<ITile> GetPotentialCollisionTiles(Rectangle boundingBox);
+        IEnumerable<Line> GetPotentialCollisionLines(Line line);
     }
 
     [DataContract(Name = "Level")]
@@ -76,6 +77,12 @@ namespace tile
         public int TileWidth { get; set; }
         [DataMember]
         public int TileHeight { get; set; }
+
+        public IEnumerable<Line> GetPotentialCollisionLines(Line line)
+        {
+            //Todo: TEMP!!!!
+            return CollisionLines;
+        }
 
         public IEnumerable<ITile> GetPotentialCollisionTiles(Rectangle boundingBox)
         {

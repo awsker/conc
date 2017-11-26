@@ -1,7 +1,10 @@
 ﻿using conc.game.entity.baseclass;
 using conc.game.entity.movement;
 using conc.game.extensions;
+using conc.game.util;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using tile.math;
 
 namespace conc.game.entity
@@ -11,6 +14,7 @@ namespace conc.game.entity
         public Vector2 Velocity { get; set; }
 
         private const float Speed = 800f;
+        private const float MaxLength = 500f;
         
         private IMovingEntity _owner;
         private LookDirection _direction;
@@ -18,8 +22,9 @@ namespace conc.game.entity
         private NinjaRope _ropeEntity;
 
         private bool _retracting;
+        private Texture2D _ropeTex;
 
-        public RopeProjectile(IMovingEntity owner, LookDirection direction):base(1, 1, new Point(2, 2), "trash/ropeprojectile")
+        public RopeProjectile(IMovingEntity owner, LookDirection direction):base(1, 1, new Point(0, 0), new Point(3, 3),  "trash/ropeprojectile")
         {
             _owner = owner;
             CollisionSettings = new CollisionSettings(true, ActionOnCollision.PushOut, 0f, 0f);
@@ -40,10 +45,21 @@ namespace conc.game.entity
             }
         }
 
+        public override void LoadContent(ContentManager contentManager)
+        {
+            base.LoadContent(contentManager);
+            var cm = Scene.GameManager.Get<ColorManager>();
+            _ropeTex = cm.Get(Color.Aquamarine);
+        }
+
         public CollisionSettings CollisionSettings { get; }
 
         public override void Update(GameTime gameTime)
         {
+            if (Length > MaxLength && !_retracting && _ropeEntity == null)
+            {
+                Retract();
+            }
             if (_retracting)
             {
                 if ((Position - _owner.Transform.Position).Length() < 30f)
@@ -51,6 +67,12 @@ namespace conc.game.entity
                 else
                     Velocity = (_owner.Transform.Position - Position).Normalized() * Speed * 1.5f;
             }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawLine(_ropeTex, _owner.Transform.Position, Position, Color.White, 1);
+            base.Draw(spriteBatch);
         }
 
         public void Retract()
@@ -70,5 +92,7 @@ namespace conc.game.entity
         {
             return _ropeEntity != null && !_retracting;
         }
+
+        private float Length => (Position - _owner.Transform.Position).Length();
     }
 }

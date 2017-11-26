@@ -7,7 +7,7 @@ namespace conc.game.entity.baseclass
     public class ImageEntity : Entity
     {
         private int _width, _height;
-        private Point _offset;
+        private Point _offset, _drawOffset;
 
         public override int Width => _width;
         public override int Height => _height;
@@ -26,11 +26,12 @@ namespace conc.game.entity.baseclass
             _loadDimensionsFromTexture = true;
         }
 
-        public ImageEntity(int width, int height, Point offset, string resource, Rectangle? sourceRect = null)
+        public ImageEntity(int width, int height, Point offset, Point drawOffset, string resource, Rectangle? sourceRect = null)
         {
             _width = width;
             _height = height;
             _offset = offset;
+            _drawOffset = drawOffset;
             _resource = resource;
             _sourceRect = sourceRect;
         }
@@ -43,13 +44,14 @@ namespace conc.game.entity.baseclass
                 _width = _sourceRect?.Width ?? _texture.Width;
                 _height = _sourceRect?.Height ?? _texture.Height;
                 _offset = new Point(_width / 2, _height / 2);
+                _drawOffset = _offset;
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             base.Draw(spriteBatch);
-            spriteBatch.Draw(_texture, Position - new Vector2(Offset.X, Offset.Y), _sourceRect, Color.White);
+            spriteBatch.Draw(_texture, Position - new Vector2(_drawOffset.X, _drawOffset.Y), _sourceRect, Color.White);
         }
     }
 }
