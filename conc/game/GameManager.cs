@@ -163,17 +163,17 @@ namespace conc.game
             _levels = LevelSerializer.DeSerialize();
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
             _colorManager = new ColorManager(GraphicsDevice);
-            
-            //var gamescene = new GameScene();
-            //SetScene(gamescene);
 
-            //gamescene.SetLevel(_levels[0]);
+            var gamescene = new GameScene(this);
+            SetScene(gamescene);
+
+            gamescene.SetLevel(_levels[0]);
 
             //var menuScene = new MainMenuScene(this);
             //SetScene(menuScene);
 
-            var audioScene = new AudioScene(this);
-            SetScene(audioScene);
+            //var audioScene = new AudioScene(this);
+            //SetScene(audioScene);
         }
         
         public override void Update(GameTime gameTime)

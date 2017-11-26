@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using conc.game.commands;
 using conc.game.gui;
 using conc.game.gui.baseclass;
