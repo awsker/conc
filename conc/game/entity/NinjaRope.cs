@@ -2,7 +2,9 @@
 using conc.game.entity.baseclass;
 using conc.game.entity.movement;
 using conc.game.extensions;
+using conc.game.util;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using tile.math;
 
@@ -10,9 +12,6 @@ namespace conc.game.entity
 {
     public class NinjaRope : Entity
     {
-        public override int Width => 0;
-        public override int Height => 0;
-
         private IMovingEntity _owner;
         private LookDirection _direction;
 
@@ -21,14 +20,23 @@ namespace conc.game.entity
 
         private bool _retracting;
 
+        private Texture2D _ropeTex;
+
         public NinjaRope(Vector2 position, IMovingEntity owner, LookDirection spinDirection)
         {
             Position = position;
+
             _owner = owner;
             _distance = distanceToOwner();
             _direction = spinDirection;
             _velocity = Math.Max(owner.Velocity.Length() * 1.1f, 250f);
 
+        }
+
+        public override void LoadContent(ContentManager contentManager)
+        {
+            var cm = Scene.GameManager.Get<ColorManager>();
+            _ropeTex = cm.Get(Color.Aquamarine);
         }
 
         public override void Update(GameTime gameTime)
@@ -45,6 +53,11 @@ namespace conc.game.entity
             }
         }
 
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawLine(_owner.Transform.Position, Position,);
+        }
+        
         public void Retract()
         {
             _retracting = true;
@@ -54,5 +67,6 @@ namespace conc.game.entity
         {
             return (Position - _owner.Transform.Position).Length();
         }
+
     }
 }

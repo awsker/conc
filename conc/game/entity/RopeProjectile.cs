@@ -2,23 +2,16 @@
 using conc.game.entity.movement;
 using conc.game.extensions;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 using tile.math;
 
 namespace conc.game.entity
 {
-    public class RopeProjectile : Entity, IMovingEntity
+    public class RopeProjectile : ImageEntity, IMovingEntity
     {
-        public override int Width => 5;
-        public override int Height => 5;
-
         public Vector2 Velocity { get; set; }
 
         private const float Speed = 800f;
-
-        private Texture2D _texture;
-
+        
         private IMovingEntity _owner;
         private LookDirection _direction;
 
@@ -26,11 +19,10 @@ namespace conc.game.entity
 
         private bool _retracting;
 
-        public RopeProjectile(IMovingEntity owner, LookDirection direction)
+        public RopeProjectile(IMovingEntity owner, LookDirection direction):base(1, 1, new Point(2, 2), "trash/ropeprojectile")
         {
             _owner = owner;
-            CollisionSettings = new CollisionSettings(true, ActionOnCollision.None, 0f, 0f);
-            _texture = owner.Scene.GameManager.Get<ContentManager>().Load<Texture2D>("trash/ropeprojectile");
+            CollisionSettings = new CollisionSettings(true, ActionOnCollision.PushOut, 0f, 0f);
 
             _direction = direction;
             Position = owner.Transform.Position;
@@ -59,12 +51,6 @@ namespace conc.game.entity
                 else
                     Velocity = (_owner.Transform.Position - Position).Normalized() * Speed * 1.5f;
             }
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            base.Draw(spriteBatch);
-            spriteBatch.Draw(_texture, Position - new Vector2(3f, 3f), Color.White);
         }
 
         public void Retract()

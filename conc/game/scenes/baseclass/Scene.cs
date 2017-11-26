@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using conc.game.commands;
 using conc.game.entity.baseclass;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace conc.game.scenes.baseclass
@@ -40,6 +41,7 @@ namespace conc.game.scenes.baseclass
         {
             _entities.Add(entity);
             entity.Scene = this;
+            entity.LoadContent(_gameManager.Get<ContentManager>());
         }
 
         public GameManager GameManager => _gameManager;

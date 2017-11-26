@@ -53,6 +53,7 @@
     <Compile Include="game\entity\animation\PlaybackType.cs" />
     <Compile Include="game\entity\baseclass\AnimatedEntity.cs" />
     <Compile Include="game\entity\baseclass\Entity.cs" />
+    <Compile Include="game\entity\baseclass\ImageEntity.cs" />
     <Compile Include="game\entity\movement\CollisionSettings.cs" />
     <Compile Include="game\entity\movement\IMovementHandler.cs" />
     <Compile Include="game\entity\movement\IMovingEntity.cs" />

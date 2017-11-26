@@ -6,6 +6,7 @@ using conc.game.entity.movement;
 using conc.game.extensions;
 using conc.game.input;
 using conc.game.scenes;
+using conc.game.util;
 using Microsoft.Xna.Framework;
 using tile.math;
 
@@ -93,6 +94,8 @@ namespace conc.game.entity
             applyGravity(gameTime);
             applyWallSlideDeacceleration(gameTime);
             readInput(gameTime);
+            if (Velocity.Y < 0)
+                GameDebug.Log("Velocity: ", Velocity.Y);
         }
 
         private void updateJump()
