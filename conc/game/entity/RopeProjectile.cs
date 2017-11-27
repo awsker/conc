@@ -24,7 +24,9 @@ namespace conc.game.entity
         private bool _retracting;
         private Texture2D _ropeTex;
 
-        public RopeProjectile(IMovingEntity owner, LookDirection direction):base(1, 1, new Point(0, 0), new Point(3, 3),  "trash/ropeprojectile")
+        private float _gravity;
+
+        public RopeProjectile(IMovingEntity owner, LookDirection direction, float gravity):base(1, 1, new Point(0, 0), new Point(3, 3),  "trash/ropeprojectile")
         {
             _owner = owner;
             CollisionSettings = new CollisionSettings(true, ActionOnCollision.PushOut, 0f, 0f);
@@ -32,6 +34,7 @@ namespace conc.game.entity
             _direction = direction;
             Position = owner.Transform.Position;
             Velocity = new Vector2(Speed * (direction == LookDirection.Left ? -1f : 1f), -Speed);
+            _gravity = gravity;
         }
 
         public void OnCollisionWithBackground(IMovementHandler handler, Vector2 collision, Line line)
@@ -40,7 +43,7 @@ namespace conc.game.entity
             CollisionSettings.CheckCollisionsWithBackground = false;
             if (_ropeEntity == null && !_retracting)
             {
-                _ropeEntity = new NinjaRope(Position, _owner, _direction);
+                _ropeEntity = new NinjaRope(Position, _owner, _direction, _gravity);
                 Scene.AddEntity(_ropeEntity);
             }
         }

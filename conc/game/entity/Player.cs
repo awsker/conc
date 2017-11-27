@@ -271,7 +271,7 @@ namespace conc.game.entity
             float lowestYsHighestY = 0;
             foreach (var sensor in sensors)
             {
-                foreach (var gl in level.GetPotentialCollisionLines(sensor))
+                foreach (var gl in level.GetPotentialCollisionLines(sensor).Where(isLineValidGround))
                 {
                     var glLowestY = Math.Min(gl.Start.Y, gl.End.Y);
                     var glHighestY = Math.Max(gl.Start.Y, gl.End.Y);
@@ -419,7 +419,7 @@ namespace conc.game.entity
         private void fireNinjaRope()
         {
             _hasFiredRopeThisPress = true;
-            var rope = new RopeProjectile(this, LookDirection);
+            var rope = new RopeProjectile(this, LookDirection, _settings.Gravity);
             Scene.AddEntity(rope);
             _rope = rope;
         }
@@ -427,6 +427,11 @@ namespace conc.game.entity
         private void retractRope()
         {
             _rope?.Retract();
+        }
+
+        private bool isHooked()
+        {
+            return _rope != null && _rope.IsHooked();
         }
 
         public bool IsAlive { get; private set; }
