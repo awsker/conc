@@ -1,6 +1,10 @@
-﻿using conc.game.entity.baseclass;
+﻿using System;
+using conc.game.entity.baseclass;
+using conc.game.math;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using tile;
+using tile.math;
 
 namespace conc.game.scenes.baseclass
 {
@@ -16,6 +20,10 @@ namespace conc.game.scenes.baseclass
 
         void SetPosition(Vector2 position);
         void SetTarget(IEntity target);
+
+        void SetLevel(ILevel level);
+
+        RectangleF GetViewRectangle();
     }
 
     public class Camera : ICamera
@@ -27,7 +35,12 @@ namespace conc.game.scenes.baseclass
 
         private IEntity _target;
 
+        private ILevel _level;
+
         private float m_cameraSpeed = 20f;
+
+        private RectangleF _viewingRectangle;
+        
 
         public Camera(GraphicsDeviceManager device)
         {
@@ -54,20 +67,67 @@ namespace conc.game.scenes.baseclass
         public void SetTarget(IEntity target)
         {
             _target = target;
+            Position = _target.Transform.Position;
         }
+
+        public void SetLevel(ILevel level)
+        {
+            _level = level;
+        }
+        
+        public bool KeepCameraInsideBounds { get; set; }
 
         public void Update(GameTime gameTime)
         {
             if (_target != null)
                 Position = Vector2.Lerp(Position, _target.Transform.Position, (float) gameTime.ElapsedGameTime.TotalSeconds * m_cameraSpeed);
-
+            
             var viewportWidth = _device.PreferredBackBufferWidth;
             var viewportHeight = _device.PreferredBackBufferHeight;
 
-            var screenCenter = new Vector2(viewportWidth / 2f, viewportHeight / 2f);
+            var worldViewportWidth = _defaultViewportX;
+            var worldViewportHeight = _defaultViewportY;
 
-            var scaleX = viewportWidth / _defaultViewportX;
-            var scaleY = viewportHeight / _defaultViewportY;
+            if (KeepCameraInsideBounds)
+            {
+                bool shrunk = false;
+                if (worldViewportWidth > _level.Width * _level.TileWidth)
+                {
+                    worldViewportWidth = _level.Width * _level.TileWidth;
+                    shrunk = true;
+                }
+                if (worldViewportHeight > _level.Height * _level.TileHeight)
+                {
+                    worldViewportHeight = _level.Height * _level.TileHeight;
+                    shrunk = true;
+                }
+                if (shrunk)
+                {
+                    var ratio = (double)viewportWidth / (double)viewportHeight;
+                    var worldRatio = (double) worldViewportWidth / (double) worldViewportHeight;
+                    if (worldRatio > ratio)
+                    {
+                        worldViewportWidth = (float) (worldViewportHeight * ratio);
+                    } else if (worldRatio < ratio)
+                    {
+                        worldViewportHeight = (float) (worldViewportWidth / ratio);
+                    }
+                }
+                var minX = worldViewportWidth * 0.5f;
+                var minY = worldViewportHeight * 0.5f;
+                var maxX = _level.Width * _level.TileWidth - minX;
+                var maxY = _level.Height * _level.TileHeight - minY;
+
+                var x = Math.Max(minX, Math.Min(maxX, Position.X));
+                var y = Math.Max(minY, Math.Min(maxY, Position.Y));
+                Position = new Vector2(x, y);
+            }
+
+            var screenCenter = new Vector2(viewportWidth * 0.5f, viewportHeight * 0.5f);
+            
+            var scaleX = viewportWidth / worldViewportWidth;
+            var scaleY = viewportHeight / worldViewportHeight;
+
 
             var innerScale = new Vector2(scaleX, scaleY);
             var totalScale = innerScale * Scale;
@@ -79,6 +139,14 @@ namespace conc.game.scenes.baseclass
                         Matrix.CreateRotationZ(Rotation) *
                         Matrix.CreateTranslation(origin.X, origin.Y, 0) *
                         Matrix.CreateScale(new Vector3(totalScale.X, totalScale.Y, 1f));
+
+            
+            _viewingRectangle = new RectangleF(Position.X - worldViewportWidth * 0.5f, Position.Y - worldViewportHeight * 0.5f,Position.X + worldViewportWidth * 0.5f, Position.Y + worldViewportHeight * 0.5f);
+        }
+
+        public RectangleF GetViewRectangle()
+        {
+            return _viewingRectangle;
         }
     }
 }

@@ -7,7 +7,8 @@ namespace conc.game.entity.baseclass
     public class ImageEntity : Entity
     {
         private int _width, _height;
-        private Point _offset, _drawOffset;
+        private Point _offset;
+        private Vector2 _drawOffset;
 
         public override int Width => _width;
         public override int Height => _height;
@@ -26,7 +27,7 @@ namespace conc.game.entity.baseclass
             _loadDimensionsFromTexture = true;
         }
 
-        public ImageEntity(int width, int height, Point offset, Point drawOffset, string resource, Rectangle? sourceRect = null)
+        public ImageEntity(int width, int height, Point offset, Vector2 drawOffset, string resource, Rectangle? sourceRect = null)
         {
             _width = width;
             _height = height;
@@ -44,7 +45,7 @@ namespace conc.game.entity.baseclass
                 _width = _sourceRect?.Width ?? _texture.Width;
                 _height = _sourceRect?.Height ?? _texture.Height;
                 _offset = new Point(_width / 2, _height / 2);
-                _drawOffset = _offset;
+                _drawOffset = new Vector2(_width / 2f, _height / 2f);
             }
         }
 

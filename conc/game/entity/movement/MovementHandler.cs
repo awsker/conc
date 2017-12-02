@@ -37,7 +37,7 @@ namespace conc.game.entity.movement
                 var tempPos = entity.Transform.Position;
                 if (entity.CollisionSettings.ActionOnCollision == ActionOnCollision.PushOut)
                 {
-                    float backoff = 0.1f;
+                    float backoff = 0.01f;
                     while (line.Intersecting(lines[i]))
                     {
                         overlap = true;

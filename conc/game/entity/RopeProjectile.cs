@@ -26,7 +26,7 @@ namespace conc.game.entity
 
         private float _gravity;
 
-        public RopeProjectile(IMovingEntity owner, LookDirection direction, float gravity):base(1, 1, new Point(0, 0), new Point(3, 3),  "trash/ropeprojectile")
+        public RopeProjectile(IMovingEntity owner, LookDirection direction, float gravity):base(1, 1, new Point(0, 0), new Vector2(3.5f, 3.5f),  "trash/ropeprojectile")
         {
             _owner = owner;
             CollisionSettings = new CollisionSettings(true, ActionOnCollision.PushOut, 0f, 0f);
@@ -65,7 +65,7 @@ namespace conc.game.entity
             }
             if (_retracting)
             {
-                if ((Position - _owner.Transform.Position).Length() < 30f)
+                if ((Position - _owner.Transform.Position).Length() < 6f)
                     Destroy();
                 else
                     Velocity = (_owner.Transform.Position - Position).Normalized() * Speed * 1.5f;

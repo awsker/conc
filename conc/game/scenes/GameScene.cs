@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using conc.game.commands;
 using conc.game.entity;
 using conc.game.entity.animation;
@@ -62,12 +63,13 @@ namespace conc.game.scenes
             }
 
             _camera.Update(gameTime);
+
+            RemoveDestroyedEntities();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null,
-                _camera.Transform);
+            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, _camera.Transform);
 
             DrawLevel(spriteBatch);
 
@@ -79,12 +81,15 @@ namespace conc.game.scenes
 
         private void DrawLevel(SpriteBatch spriteBatch)
         {
-            var playerX = (int)_player.Transform.Position.X / GameSettings.TileSize;
-            var playerY = (int)_player.Transform.Position.Y / GameSettings.TileSize;
+            var cameraRect = _camera.GetViewRectangle();
+            var rect = new Rectangle(new Point(Convert.ToInt32(Math.Floor(cameraRect.MinX / _level.TileWidth)),
+                                               Convert.ToInt32(Math.Floor(cameraRect.MinY / _level.TileHeight))),
+                                     new Point(Convert.ToInt32(Math.Ceiling(cameraRect.Width / _level.TileWidth)),
+                                               Convert.ToInt32(Math.Ceiling(cameraRect.Height / _level.TileHeight))));
 
-            for (var y = playerY - GameSettings.DrawTileAmount; y <= playerY + GameSettings.DrawTileAmount; y++)
+            for (var y = rect.Y; y <= rect.Y + rect.Height; ++y)
             {
-                for (var x = playerX - GameSettings.DrawTileAmount; x <= playerX + GameSettings.DrawTileAmount; x++)
+                for (var x = rect.X; x <= rect.X + rect.Width; ++x)
                 {
                     if (x < 0 || y < 0 || x >= _level.Width || y >= _level.Height)
                         continue;
@@ -119,8 +124,11 @@ namespace conc.game.scenes
             _player = new Player(new Vector2(_level.Start.X + _level.Start.Width/2f, _level.Start.Top), _animationReader.GetAnimator("Player"));
             AddEntity(_player);
 
-            _camera = new Camera(_videoManager.GraphicsDeviceManager);
-            _camera.SetTarget(_player);
+            var camera = new Camera(_videoManager.GraphicsDeviceManager);
+            camera.SetTarget(_player);
+            camera.SetLevel(level);
+            camera.KeepCameraInsideBounds = true;
+            _camera = camera;
         }
 
         public ILevel CurrentLevel => _level;

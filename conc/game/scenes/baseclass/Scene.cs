@@ -53,15 +53,22 @@ namespace conc.game.scenes.baseclass
 
         public virtual void LoadContent() { }
 
-        public virtual void Update(GameTime gameTime)
+        public virtual void RemoveDestroyedEntities()
         {
             //Remove all destroyed entities
             for (int i = _entities.Count - 1; i >= 0; --i)
             {
-                if(_entities[i].IsDestroyed)
+                if (_entities[i].IsDestroyed)
                     _entities.RemoveAt(i);
             }
         }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            RemoveDestroyedEntities();
+        }
+
+
         public virtual void Draw(SpriteBatch spriteBatch) { }
     }
 }

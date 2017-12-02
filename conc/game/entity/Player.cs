@@ -53,8 +53,8 @@ namespace conc.game.entity
                 Gravity = 400f,
                 TerminalVelocity = 800f,
                 InAirAccelerationFactor = .7f,
-                InAirDeaccelerationFactor = .7f,
-                JumpTimeSlack = TimeSpan.FromMilliseconds(100), //100 milliseconds of Wile E. Coyote time
+                InAirDeaccelerationFactor = .2f,
+                JumpTimeSlack = TimeSpan.FromMilliseconds(150), //150 milliseconds of Wile E. Coyote time
                 WallSlideMaxDownSpeed = 75f,
                 NumDoubleJumps = 1
             };
@@ -104,8 +104,7 @@ namespace conc.game.entity
             applyGravity(gameTime);
             applyWallSlideDeacceleration(gameTime);
             readInput(gameTime);
-            if (Velocity.Y < 0)
-                GameDebug.Log("Velocity: ", Velocity.Y);
+            GameDebug.Log("Y", Position.Y);
         }
 
         private void updateJump()
@@ -143,18 +142,14 @@ namespace conc.game.entity
 
         private void updateInAirStatus(GameTime gametime)
         {
-            var inputManager = Scene.GameManager.Get<InputManager>();
-            bool holdingLeft = inputManager.IsDown(ControlButtons.Left, _playerNo);
-            bool holdingRight = inputManager.IsDown(ControlButtons.Right, _playerNo);
             if (Scene is GameScene gamescene)
             {
                 var rightSideLine = createTouchSensorLine(BoundingBox.Lines[1], 0.5f);
                 var footLines = createTouchSensorCrossLines(BoundingBox.Lines[2]);
                 var leftSideLine = createTouchSensorLine(BoundingBox.Lines[3], 0.5f);
 
-                //_onRoof = lines.Any(l => l.Intersecting(roofLine));
-                _onRightWall = holdingRight && intersectsLevel(rightSideLine, gamescene.CurrentLevel, isValidWall);
-                _onLeftWall = holdingLeft && intersectsLevel(leftSideLine, gamescene.CurrentLevel, isValidWall);
+                _onRightWall = intersectsLevel(rightSideLine, gamescene.CurrentLevel, isValidWall);
+                _onLeftWall = intersectsLevel(leftSideLine, gamescene.CurrentLevel, isValidWall);
                 _currentGround = isSensorTouchingGroundLine(footLines, gamescene.CurrentLevel);
                 _onGround = _currentGround != null;
 
@@ -212,7 +207,10 @@ namespace conc.game.entity
         
         private bool isClingingToWall()
         {
-            return !_onGround && (_onLeftWall || _onRightWall);
+            var inputManager = Scene.GameManager.Get<InputManager>();
+            bool holdingLeft = inputManager.IsDown(ControlButtons.Left, _playerNo);
+            bool holdingRight = inputManager.IsDown(ControlButtons.Right, _playerNo);
+            return !_onGround && (holdingLeft && _onLeftWall || holdingRight && _onRightWall);
         }
 
         private void updateLevelObjects()
@@ -241,15 +239,7 @@ namespace conc.game.entity
                 IsAlive = true;
             }
         }
-
-        private bool canJump(GameTime time)
-        {
-            var enoughTimePassedSinceLastJump = _lastJump == null || time.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
-            return enoughTimePassedSinceLastJump && 
-                (_lastTouchGround != null && time.TotalGameTime - _lastTouchGround.TotalGameTime <= _settings.JumpTimeSlack ||
-                _doubleJumpsRemaining > 0);
-        }
-
+        
         private Line createTouchSensorLine(Line side, float placeOnLine)
         {
             var start = side.Start * placeOnLine + side.End * (1f - placeOnLine);
@@ -283,7 +273,6 @@ namespace conc.game.entity
                         bestLine = gl;
                         lowestY = glLowestY;
                         lowestYsHighestY = glHighestY;
-                        break; //Remaining sensors don't need to check against this line
                     }
                 }
             }
@@ -375,7 +364,7 @@ namespace conc.game.entity
         private bool tryJump(GameTime currentTime)
         {
             var enoughTimePassedSinceLastJump = _lastJump == null || currentTime.TotalGameTime - _lastJump.TotalGameTime > TimeSpan.FromMilliseconds(100);
-            if (!enoughTimePassedSinceLastJump)
+            if (!enoughTimePassedSinceLastJump || isHooked())
                 return false;
 
             //Prioritize normal jumps before wall jumps
@@ -399,6 +388,7 @@ namespace conc.game.entity
             if (_doubleJumpsRemaining > 0)
             {
                 jump(currentTime);
+                --_doubleJumpsRemaining;
                 return true;
             }
             return false;
@@ -406,9 +396,6 @@ namespace conc.game.entity
 
         private void jump(GameTime currentTime)
         {
-            if (currentTime.TotalGameTime - _lastTouchGround.TotalGameTime > _settings.JumpTimeSlack)
-                --_doubleJumpsRemaining;
-
             _hasJumpedThisPress = true;
             _jumpPeak = Transform.Position.Y - _settings.JumpHeight;
             _isJumping = true;
