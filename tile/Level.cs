@@ -16,9 +16,9 @@ namespace tile
         Line[] CollisionLines { get; set; }
         Rectangle[,] CameraCollisions { get; set; }
         IList<Rectangle> Deaths { get; set; }
-        Rectangle Start { get; set; }
+        Point Start { get; set; }
         Rectangle Goal { get; set; }
-        IList<Rectangle> Checkpoints { get; set; }
+        IList<Checkpoint> Checkpoints { get; set; }
         Vector2 ViewStart { get; set; }
 
         int Width { get; }
@@ -59,13 +59,13 @@ namespace tile
         public IList<Rectangle> Deaths { get; set; }
 
         [DataMember]
-        public Rectangle Start { get; set; }
+        public Point Start { get; set; }
 
         [DataMember]
         public Rectangle Goal { get; set; }
 
         [DataMember]
-        public IList<Rectangle> Checkpoints { get; set; }
+        public IList<Checkpoint> Checkpoints { get; set; }
 
         [DataMember]
         public Vector2 ViewStart { get; set; }
@@ -136,7 +136,6 @@ namespace tile
                     to[i, j] = from[i][j];
                 }
             }
-
             return to;
         }
 

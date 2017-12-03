@@ -7,6 +7,7 @@ using conc.game.entity.movement;
 using conc.game.extensions;
 using conc.game.input;
 using conc.game.scenes;
+using conc.game.scenes.baseclass;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using tile;
@@ -38,7 +39,7 @@ namespace conc.game.entity
 
         private RopeProjectile _rope;
 
-        private Rectangle _checkpoint;
+        private Point _spawn;
 
         public Player(Vector2 position, IAnimator animator) : base(position, animator)
         {
@@ -58,9 +59,17 @@ namespace conc.game.entity
                 WallSlideMaxDownSpeed = 75f,
                 NumDoubleJumps = 1
             };
+        }
 
-            if (Scene is GameScene gameScene)
-                _checkpoint = gameScene.CurrentLevel.Checkpoints[0];
+        public override IScene Scene
+        {
+            get { return base.Scene; }
+            set
+            {
+                base.Scene = value;
+                if (Scene is GameScene gameScene)
+                    _spawn = gameScene.CurrentLevel.Start;
+            }
         }
         
         public Vector2 Velocity { get; set; }
@@ -220,8 +229,8 @@ namespace conc.game.entity
                 foreach (var checkpoint in gameScene.CurrentLevel.Checkpoints)
                 {
                     var boundingRectangle = BoundingBox.Rectangle;
-                    if (_checkpoint != checkpoint && boundingRectangle.Intersects(checkpoint))
-                        _checkpoint = checkpoint;
+                    if (boundingRectangle.Intersects(checkpoint.Rectangle))
+                        _spawn = checkpoint.Spawn;
                 }
 
                 foreach (var death in gameScene.CurrentLevel.Deaths)
@@ -232,14 +241,19 @@ namespace conc.game.entity
                 }
             }
 
-            if (!IsAlive)
+            if (!IsAlive && _spawn != Point.Zero)
             {
-                Transform.Position = new Vector2(_checkpoint.X + _checkpoint.Width/2f, _checkpoint.Top);
-                Velocity = Vector2.Zero;
-                IsAlive = true;
+                respawn();
             }
         }
-        
+
+        private void respawn()
+        {
+            Transform.Position = new Vector2(_spawn.X, _spawn.Y);
+            Velocity = Vector2.Zero;
+            IsAlive = true;
+        }
+
         private Line createTouchSensorLine(Line side, float placeOnLine)
         {
             var start = side.Start * placeOnLine + side.End * (1f - placeOnLine);

@@ -69,6 +69,6 @@ namespace conc.game.entity.baseclass
 
         public virtual Box BoundingBox => new Box(Width, Height) { Scale = Scale, Origin = new Vector2(Offset.X, Offset.Y), Position = Position, Rotation = Rotation };
 
-        public IScene Scene { get; set; }
+        public virtual IScene Scene { get; set; }
     }
 }

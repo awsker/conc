@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Xml;
 using tile;
 using Microsoft.Xna.Framework;
@@ -47,7 +49,7 @@ namespace BGStageGenerator
                         Background = new ITile[width, height],
                         Foreground = new ITile[width, height],
                         Deaths = new List<Rectangle>(),
-                        Checkpoints = new List<Rectangle>(),
+                        Checkpoints = new List<Checkpoint>(),
                         TileWidth = tileWidth, 
                         TileHeight = tileHeight
                     };
@@ -176,12 +178,17 @@ namespace BGStageGenerator
             if (objectGroup == null)
                 return;
 
+            var spawnList = new List<Point>();
             foreach (XmlNode objectsNode in objectGroup.SelectNodes("object"))
             {
                 var x = int.Parse(objectsNode.Attributes["x"].Value);
                 var y = int.Parse(objectsNode.Attributes["y"].Value);
-                var width = int.Parse(objectsNode.Attributes["width"].Value);
-                var height = int.Parse(objectsNode.Attributes["height"].Value);
+                int width = 0;
+                int height = 0;
+                if(objectsNode.Attributes["width"] != null) 
+                    width = int.Parse(objectsNode.Attributes["width"].Value);
+                if (objectsNode.Attributes["height"] != null)
+                    height = int.Parse(objectsNode.Attributes["height"].Value);
                 var name = objectsNode.Attributes["name"].Value.ToLower();
                 if (name == "death")
                 {
@@ -189,18 +196,35 @@ namespace BGStageGenerator
                 }
                 else if (name == "start")
                 {
-                    data.Start = new Rectangle(x, y, width, height);
-                    data.Checkpoints.Add(data.Start);
+                    data.Start = new Point(x, y);
                 }
                 else if (name == "checkpoint")
                 {
-                    data.Checkpoints.Add(new Rectangle(x, y, width, height));
+                    data.Checkpoints.Add(new Checkpoint() {Rectangle = new Rectangle(x, y, width, height)});
+                }
+                else if (name == "spawn")
+                {
+                    spawnList.Add(new Point(x, y));
                 }
                 else if (name == "goal")
                 {
                     data.Goal = new Rectangle(x, y, width, height);
                 }
             }
+            //Resolve spawns to their respective checkpoints
+            foreach(var checkpoint in data.Checkpoints)
+            {
+                Point point = spawnList.FirstOrDefault(p => pointWithinRectangle(checkpoint.Rectangle, p));
+                if (point == Point.Zero)
+                    throw new Exception("No spawn set for checkpoint");
+
+                checkpoint.Spawn = point;
+            }
+        }
+
+        private bool pointWithinRectangle(Rectangle rect, Point p)
+        {
+            return p.X >= rect.X && p.Y >= rect.Y && p.X <= rect.X + rect.Width && p.Y <= rect.Y + rect.Height;
         }
 
         private Line[] getCollisionPolygons(ILevel level)

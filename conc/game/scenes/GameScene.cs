@@ -121,7 +121,7 @@ namespace conc.game.scenes
             _animationReader = new AnimationReader();
             _animationReader.LoadAllTemplates();
             
-            _player = new Player(new Vector2(_level.Start.X + _level.Start.Width/2f, _level.Start.Top), _animationReader.GetAnimator("Player"));
+            _player = new Player(new Vector2(_level.Start.X, _level.Start.Y), _animationReader.GetAnimator("Player"));
             AddEntity(_player);
 
             var camera = new Camera(_videoManager.GraphicsDeviceManager);
