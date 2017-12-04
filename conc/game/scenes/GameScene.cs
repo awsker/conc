@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using conc.game.commands;
 using conc.game.entity;
 using conc.game.entity.animation;
@@ -24,7 +23,6 @@ namespace conc.game.scenes
     public class GameScene : Scene, IGameScene
     {
         private ILevel _level;
-        private Texture2D[] _tilesetTextures;
         private ICamera _camera;
         private ContentManager _contentManager;
         private InputManager _inputManager;
@@ -81,42 +79,15 @@ namespace conc.game.scenes
 
         private void DrawLevel(SpriteBatch spriteBatch)
         {
-            var cameraRect = _camera.GetViewRectangle();
-            var rect = new Rectangle(new Point(Convert.ToInt32(Math.Floor(cameraRect.MinX / _level.TileWidth)),
-                                               Convert.ToInt32(Math.Floor(cameraRect.MinY / _level.TileHeight))),
-                                     new Point(Convert.ToInt32(Math.Ceiling(cameraRect.Width / _level.TileWidth)),
-                                               Convert.ToInt32(Math.Ceiling(cameraRect.Height / _level.TileHeight))));
-
-            for (var y = rect.Y; y <= rect.Y + rect.Height; ++y)
-            {
-                for (var x = rect.X; x <= rect.X + rect.Width; ++x)
-                {
-                    if (x < 0 || y < 0 || x >= _level.Width || y >= _level.Height)
-                        continue;
-
-                    var tile = _level.Tiles[x, y];
-
-                    if (tile != null)
-                    {
-                        var tileset = _level.Tilesets[tile.TilesetIndex];
-                        spriteBatch.Draw(_tilesetTextures[tile.TilesetIndex], new Vector2(tile.X * tileset.TileWidth, tile.Y * tileset.TileHeight), tile.Source, Color.White);
-                    }
-                }
-            }
+            _level.DrawLevel(spriteBatch.GraphicsDevice);
         }
-
+       
         public void SetLevel(ILevel level)
         {
             _entities.Clear();
             _level = level;
 
-            var tilesetPath = @"tilesets\";
-            _tilesetTextures = new Texture2D[_level.Tilesets.Length];
-            for (int i = 0; i < _level.Tilesets.Length; ++i)
-            {
-                var tileset = _level.Tilesets[i];
-                _tilesetTextures[i] = _contentManager.Load<Texture2D>(tilesetPath + tileset.Source);
-            }
+            _level.LoadContent(GameManager.GraphicsDevice, GameManager.Get<ContentManager>());
 
             _animationReader = new AnimationReader();
             _animationReader.LoadAllTemplates();

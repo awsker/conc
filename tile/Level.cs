@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using tile.math;
 
 namespace tile
@@ -26,7 +28,8 @@ namespace tile
         int TileWidth { get; }
         int TileHeight { get; }
 
-        //IEnumerable<ITile> GetPotentialCollisionTiles(Rectangle boundingBox);
+        void LoadContent(GraphicsDevice device, ContentManager manager);
+        void DrawLevel(GraphicsDevice device);
         IEnumerable<Line> GetPotentialCollisionLines(Line line);
     }
 
@@ -77,6 +80,8 @@ namespace tile
         public int TileWidth { get; set; }
         [DataMember]
         public int TileHeight { get; set; }
+
+        private List<BufferData> _buffers = null;
 
         public IEnumerable<Line> GetPotentialCollisionLines(Line line)
         {
@@ -139,5 +144,98 @@ namespace tile
             return to;
         }
 
+        public void LoadContent(GraphicsDevice device, ContentManager contentManager)
+        {
+            var tilesetPath = @"tilesets\";
+            foreach(var tileset in Tilesets)
+            {
+                tileset.Texture = contentManager.Load<Texture2D>(tilesetPath + tileset.Source);
+            }
+            calculateVertexBuffers(device);
+        }
+
+        public void DrawLevel(GraphicsDevice device)
+        {
+            drawBuffers(device);
+        }
+
+        private void calculateVertexBuffers(GraphicsDevice device)
+        {
+            if (_buffers != null) //Only create buffers once
+                return;
+
+            _buffers = new List<BufferData>();
+            _buffers.AddRange(createVertexBuffer(device, Background));
+            _buffers.AddRange(createVertexBuffer(device, Tiles));
+            _buffers.AddRange(createVertexBuffer(device, Foreground));
+        }
+
+        private void drawBuffers(GraphicsDevice device)
+        {
+            if (_buffers == null)
+                calculateVertexBuffers(device);
+
+            device.RasterizerState = new RasterizerState() { CullMode = CullMode.None };
+            device.DepthStencilState = DepthStencilState.None;
+
+            foreach (var buffer in _buffers)
+            {
+                device.Indices = buffer.IndexBuffer;
+                device.SetVertexBuffer(buffer.VertexBuffer);
+                device.Textures[0] = Tilesets[buffer.TilesetIndex].Texture;
+                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, buffer.IndexBuffer.IndexCount / 3);
+            }
+        }
+
+        private IEnumerable<BufferData> createVertexBuffer(GraphicsDevice device, ITile[,] tiles)
+        {
+            var xsize = tiles.GetLength(0);
+            var ysize = tiles.GetLength(1);
+
+            for (int tsi = 0; tsi < Tilesets.Length; ++tsi)
+            {
+                var tileset = Tilesets[tsi];
+                var vbData = new List<VertexPositionTexture>();
+                var ibData = new List<int>();
+                bool found = false;
+                for (int x = 0; x < xsize; ++x)
+                {
+                    for (int y = 0; y < ysize; ++y)
+                    {
+                        var tile = tiles[x, y];
+                        if (tile?.TilesetIndex == tsi)
+                        {
+                            found = true;
+                            var fx = x * tileset.TileWidth;
+                            var fy = y * tileset.TileHeight;
+                            var fx2 = (x + 1) * tileset.TileWidth;
+                            var fy2 = (y + 1) * tileset.TileHeight;
+                            var currentFbindex = vbData.Count;
+                            var sourceRect = tile.Source;
+                            float tsWidth = tileset.TileWidth * tileset.Columns;
+                            float tsHeight = tileset.TileHeight * tileset.Rows;
+                            var tx = sourceRect.X / tsWidth;
+                            var ty = sourceRect.Y / tsHeight;
+                            var tx2 = (sourceRect.X + sourceRect.Width) / tsWidth;
+                            var ty2 = (sourceRect.Y + sourceRect.Height) / tsHeight;
+
+                            vbData.Add(new VertexPositionTexture(new Vector3(fx, fy, 0f), new Vector2(tx, ty)));
+                            vbData.Add(new VertexPositionTexture(new Vector3(fx2, fy, 0f), new Vector2(tx2, ty)));
+                            vbData.Add(new VertexPositionTexture(new Vector3(fx2, fy2, 0f), new Vector2(tx2, ty2)));
+                            vbData.Add(new VertexPositionTexture(new Vector3(fx, fy2, 0f), new Vector2(tx, ty2)));
+                            ibData.AddRange(new[] { currentFbindex, currentFbindex + 3, currentFbindex + 1, currentFbindex + 3, currentFbindex + 1, currentFbindex + 2 });
+                        }
+                    }
+                }
+                if (found)
+                {
+                    var vb = new VertexBuffer(device, VertexPositionTexture.VertexDeclaration, vbData.Count, BufferUsage.WriteOnly);
+                    vb.SetData(vbData.ToArray());
+                    var ib = new IndexBuffer(device, IndexElementSize.ThirtyTwoBits, ibData.Count, BufferUsage.WriteOnly);
+                    ib.SetData(ibData.ToArray());
+                    yield return new BufferData(vb, tsi, ib);
+                }
+            }
+        }
     }
 }
