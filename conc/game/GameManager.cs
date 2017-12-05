@@ -29,7 +29,6 @@ namespace conc.game
         private readonly InputManager _inputManager;
         private VideoModeManager _videoManager;
         private ColorManager _colorManager;
-        private IConfigManager _configManager;
 
         private IScene _scene;
         private IScene _nextScene;
@@ -45,8 +44,7 @@ namespace conc.game
             _game.IsFixedTimeStep = false;
             _contentManager = new ContentManager(game.Services, "content");
             _inputManager = new InputManager(numPlayers: 1);
-            _configManager = new ConfigManager();
-            _configManager.WriteDefaultConfig();
+            _inputManager.WriteDefaultConfig();
             initVideoManager();
         }
         #endregion
@@ -151,6 +149,9 @@ namespace conc.game
                     break;
                 case CommandType.HideCursor:
                     _game.IsMouseVisible = false;
+                    break;
+                case CommandType.SetKey:
+                    _inputManager.WriteConfigWithNewKey(command.ControlButton, command.Key);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

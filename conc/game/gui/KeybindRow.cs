@@ -1,22 +1,31 @@
 ﻿using conc.game.gui.components;
+using conc.game.input;
 using conc.game.util;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenTK.Input;
+using Microsoft.Xna.Framework.Input;
 
 namespace conc.game.gui
 {
     public interface IKeybindRow : ISettingsPanelRow
     {
-        void SetKey(Key? key);
+        void SetKey(Keys? key);
+        void SetText(string text);
+        void RestoreKey();
+        ControlButtons ControlButton { get; }
     }
 
     public class KeybindRow : SettingsPanelRow, IKeybindRow
     {
-        private Key? _key;
+        private Keys? _key;
         private readonly ILabel _keyLabel;
 
-        public KeybindRow(ColorManager colorManager, SpriteFont font, string title) : base(colorManager, font, title)
+        private string _previousText;
+
+        public KeybindRow(ColorManager colorManager, SpriteFont font, ControlButtons controlButton, Keys key) : base(colorManager, font, controlButton.ToString())
         {
+            _previousText = "<none>";
+
             _keyLabel = new Label(colorManager, font)
             {
                 Text = "<none>",
@@ -25,10 +34,13 @@ namespace conc.game.gui
                 Margin = new Margin(0f, 0f, 10f, 0f)
             };
 
+            ControlButton = controlButton;
+            SetKey(key);
+
             AddChild(_keyLabel);
         }
 
-        public void SetKey(Key? key)
+        public void SetKey(Keys? key)
         {
             _key = key;
 
@@ -40,5 +52,20 @@ namespace conc.game.gui
             
             _keyLabel.Text = _key.ToString();
         }
+
+        public void SetText(string text)
+        {
+            if (_keyLabel.Text != text)
+                _keyLabel.Text = text;
+        }
+
+        public void RestoreKey()
+        {
+            _keyLabel.Text = _previousText;
+        }
+
+        public ControlButtons ControlButton { get; }
+
+        public override Rectangle FocusBounds => Bounds;
     }
 }

@@ -217,8 +217,8 @@ namespace conc.game.entity
         private bool isClingingToWall()
         {
             var inputManager = Scene.GameManager.Get<InputManager>();
-            bool holdingLeft = inputManager.IsDown(ControlButtons.Left, _playerNo);
-            bool holdingRight = inputManager.IsDown(ControlButtons.Right, _playerNo);
+            bool holdingLeft = inputManager.IsDown(ControlButtons.MoveLeft, _playerNo);
+            bool holdingRight = inputManager.IsDown(ControlButtons.MoveRight, _playerNo);
             return !_onGround && (holdingLeft && _onLeftWall || holdingRight && _onRightWall);
         }
 
@@ -309,20 +309,20 @@ namespace conc.game.entity
             }
             
             //Move left
-            if (inputManager.IsDown(ControlButtons.Left, _playerNo))
+            if (inputManager.IsDown(ControlButtons.MoveLeft, _playerNo))
             {
                 LookDirection = LookDirection.Left;
-                if (!inputManager.IsDown(ControlButtons.Right, _playerNo) && Velocity.X > -maxSpeedX)
+                if (!inputManager.IsDown(ControlButtons.MoveRight, _playerNo) && Velocity.X > -maxSpeedX)
                 {
                     var directionVector = _currentGround?.Vector.Normalized() * -1 ?? new Vector2(-1f, 0f);
                     Velocity = Vector2.Add(Velocity, directionVector * acceleration);
                 }
             }
             //Move right
-            if (inputManager.IsDown(ControlButtons.Right, _playerNo))
+            if (inputManager.IsDown(ControlButtons.MoveRight, _playerNo))
             {
                 LookDirection = LookDirection.Right;
-                if (!inputManager.IsDown(ControlButtons.Left, _playerNo) && Velocity.X < maxSpeedX)
+                if (!inputManager.IsDown(ControlButtons.MoveLeft, _playerNo) && Velocity.X < maxSpeedX)
                 {
                     var directionVector = _currentGround?.Vector.Normalized() ?? new Vector2(1f, 0f);
                     Velocity = Vector2.Add(Velocity, directionVector * acceleration);
@@ -330,7 +330,7 @@ namespace conc.game.entity
             }
             bool deaccelerate = true; //_onGround;
             //Deaccelerate
-            if (inputManager.IsDown(ControlButtons.Right, _playerNo) == inputManager.IsDown(ControlButtons.Left, _playerNo))
+            if (inputManager.IsDown(ControlButtons.MoveRight, _playerNo) == inputManager.IsDown(ControlButtons.MoveLeft, _playerNo))
             {
                 Vector2 directionVector = Vector2.Zero;
                 if (Velocity.X > 0)

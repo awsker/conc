@@ -6,6 +6,7 @@ using conc.game.input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace conc.game.scenes.baseclass
 {
@@ -75,7 +76,7 @@ namespace conc.game.scenes.baseclass
                 _controlMode = ControlMode.Mouse;
                 ExecuteCommand?.Invoke(new Command(CommandType.ShowCursor));
             }
-            else if (inputManager.IsAnyButtonPressed(0))
+            else if (inputManager.IsAnyButtonPressed(0) && !inputManager.IsDown(Mouse.GetState().LeftButton))
             {
                 if (_controlMode == ControlMode.Mouse)
                     _keyboardActivated = true;
@@ -86,13 +87,13 @@ namespace conc.game.scenes.baseclass
 
             if (!_keyboardActivated)
             {
-                if (inputManager.IsPressed(ControlButtons.Up, 0))
+                if (inputManager.IsPressed(ControlButtons.MoveUp, 0))
                 {
                     DecreaseIndex();
                     while (!_items[_index].HasContent())
                         DecreaseIndex();
                 }
-                else if (inputManager.IsPressed(ControlButtons.Down, 0))
+                else if (inputManager.IsPressed(ControlButtons.MoveDown, 0))
                 {
                     IncreaseIndex();
                     while (!_items[_index].HasContent())

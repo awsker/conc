@@ -20,10 +20,10 @@ namespace conc.game.gui
             Position = new Vector2(500, 450);
             Size = new Vector2(600, 400);
 
-            AddRow(new KeybindRow(colorManager, font, "Move left"));
-            AddRow(new KeybindRow(colorManager, font, "Move right"));
-            AddRow(new KeybindRow(colorManager, font, "Jump"));
-            AddRow(new KeybindRow(colorManager, font, "Fire"));
+            foreach (var keybindings in inputManger.GetKeybinds())
+            {
+                AddRow(new KeybindRow(colorManager, font, keybindings.Key, keybindings.Value));
+            }
         }
 
         public override void Update(GameTime gameTime)
@@ -42,11 +42,6 @@ namespace conc.game.gui
             }
 
             base.Update(gameTime);
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            base.Draw(spriteBatch);
         }
     }
 }

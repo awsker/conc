@@ -41,6 +41,7 @@ namespace conc.game.scenes
             var font = _contentManager.Load<SpriteFont>("fonts/menu");
 
             var controlSettingsPanel = new ControlSettingsPanel(colorManager, _inputManager, font);
+            controlSettingsPanel.ExecuteCommand += ExecuteCommand;
             GuiComponents.Add(controlSettingsPanel);
         }
 

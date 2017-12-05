@@ -6,6 +6,7 @@
         ChangeScene,
         Quit,
         ShowCursor,
-        HideCursor
+        HideCursor,
+        SetKey
     }
 }

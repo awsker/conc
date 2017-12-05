@@ -9,12 +9,17 @@ namespace conc.game.gui
     {
         void SetHighlight();
         void UnsetHighlight();
+        Rectangle FocusBounds { get; }
+        void Activate();
+        void Deactivate();
+        bool Activated { get; }
     }
 
     public abstract class SettingsPanelRow : Panel, ISettingsPanelRow
     {
         private readonly Color _defaultColor;
         private readonly Color _highlightColor;
+        protected bool _activated;
 
         protected SettingsPanelRow(ColorManager colorManager, SpriteFont font, string title) : base(colorManager)
         {
@@ -43,5 +48,19 @@ namespace conc.game.gui
         {
             BackgroundColor = _highlightColor;
         }
+
+        public abstract Rectangle FocusBounds { get; }
+
+        public void Activate()
+        {
+            _activated = true;
+        }
+
+        public void Deactivate()
+        {
+            _activated = false;
+        }
+
+        public bool Activated => _activated;
     }
 }

@@ -96,7 +96,6 @@
     <Compile Include="game\scenes\SettingsScene.cs" />
     <Compile Include="game\scenes\VideoScene.cs" />
     <Compile Include="game\util\ColorManager.cs" />
-    <Compile Include="game\util\ConfigManager.cs" />
     <Compile Include="game\util\GameDebug.cs" />
     <Compile Include="game\extensions\SpriteBatchExtension.cs" />
     <Compile Include="game\extensions\Vector2Extension.cs" />
@@ -109,7 +108,6 @@
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />

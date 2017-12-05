@@ -1,4 +1,6 @@
-﻿using conc.game.scenes;
+﻿using conc.game.input;
+using conc.game.scenes;
+using Microsoft.Xna.Framework.Input;
 
 namespace conc.game.commands
 {
@@ -20,7 +22,17 @@ namespace conc.game.commands
             CommandType = commandType;
         }
 
+        public Command(ControlButtons controlButton, Keys key)
+        {
+            ControlButton = controlButton;
+            Key = key;
+            CommandType = CommandType.SetKey;
+        }
+        
         public CommandType CommandType { get; }
         public SceneType SceneType { get; }
+
+        public ControlButtons ControlButton { get; }
+        public Keys Key { get; }
     }
 }

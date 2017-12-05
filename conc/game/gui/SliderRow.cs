@@ -1,4 +1,5 @@
 ﻿using conc.game.util;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace conc.game.gui
@@ -12,5 +13,7 @@ namespace conc.game.gui
         public SliderRow(ColorManager colorManager, SpriteFont font, string title) : base(colorManager, font, title)
         {
         }
+
+        public override Rectangle FocusBounds { get; }
     }
 }
