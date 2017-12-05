@@ -4,7 +4,7 @@ using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace conc.game.gui.baseclass
+namespace conc.game.gui.components
 {
     public interface IGuiComponent
     {
@@ -26,6 +26,8 @@ namespace conc.game.gui.baseclass
 
         Color BackgroundColor { get; set; }
         Color ForegroundColor { get; set; }
+
+        Rectangle Bounds { get; }
     }
 
     public abstract class GuiComponent : IGuiComponent
@@ -77,6 +79,8 @@ namespace conc.game.gui.baseclass
         public Margin Margin { get; set; }
         public Color BackgroundColor { get; set; }
         public Color ForegroundColor { get; set; }
+
+        public Rectangle Bounds => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
 
         protected Vector2 AlignedPosition
         {

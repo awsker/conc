@@ -1,7 +1,7 @@
 ﻿using System;
 using conc.game.commands;
 using conc.game.gui;
-using conc.game.gui.baseclass;
+using conc.game.gui.components;
 using conc.game.input;
 using conc.game.scenes.baseclass;
 using conc.game.util;
@@ -40,33 +40,36 @@ namespace conc.game.scenes
 
             var colorManager = _gameManager.Get<ColorManager>();
 
-            var panel = new Panel(colorManager)
-            {
-                Position = new Vector2(200f, 200f),
-                Size = new Vector2(400f, 600f),
-                BackgroundColor = new Color(105, 143, 224)
-            };
+            //var panel = new Panel(colorManager)
+            //{
+            //    Position = new Vector2(200f, 200f),
+            //    Size = new Vector2(400f, 600f),
+            //    BackgroundColor = new Color(105, 143, 224)
+            //};
 
-            var subPanel = new Panel(colorManager)
-            {
-                Position = new Vector2(0f, 0f),
-                Size = new Vector2(400f, 100f),
-                BackgroundColor = new Color(255, 255, 255)
-            };
+            //var subPanel = new Panel(colorManager)
+            //{
+            //    Position = new Vector2(0f, 0f),
+            //    Size = new Vector2(400f, 100f),
+            //    BackgroundColor = new Color(255, 255, 255)
+            //};
 
-            var label = new Label(colorManager, _contentManager.Load<SpriteFont>("fonts/menu"))
-            {
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Margin(20f, 0f, 0f, 0f),
-                Text = "Controls",
-                ForegroundColor = new Color(53, 81, 141)
-            };
+            //var label = new Label(colorManager, _contentManager.Load<SpriteFont>("fonts/menu"))
+            //{
+            //    HorizontalAlignment = HorizontalAlignment.Left,
+            //    VerticalAlignment = VerticalAlignment.Center,
+            //    Margin = new Margin(20f, 0f, 0f, 0f),
+            //    Text = "Controls",
+            //    ForegroundColor = new Color(53, 81, 141)
+            //};
 
-            subPanel.AddChild(label);
-            panel.AddChild(subPanel);
+            //subPanel.AddChild(label);
+            //panel.AddChild(subPanel);
 
-            GuiComponents.Add(panel);
+            //GuiComponents.Add(panel);
+
+            //var audioSettingsPanel = new AudioSettingsPanel(colorManager, _inputManager);
+            //GuiComponents.Add(audioSettingsPanel);
         }
 
         public override void Update(GameTime gameTime)

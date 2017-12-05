@@ -1,7 +1,9 @@
 ﻿using System;
 using conc.game.commands;
+using conc.game.gui;
 using conc.game.input;
 using conc.game.scenes.baseclass;
+using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -34,12 +36,21 @@ namespace conc.game.scenes
             {
                 new Tuple<string, Command>("Back", new Command(SceneType.Settings))
             });
+
+            var colorManager = _gameManager.Get<ColorManager>();
+            var font = _contentManager.Load<SpriteFont>("fonts/menu");
+
+            var controlSettingsPanel = new ControlSettingsPanel(colorManager, _inputManager, font);
+            GuiComponents.Add(controlSettingsPanel);
         }
 
         public override void Update(GameTime gameTime)
         {
             if (_inputManager.IsPressed(Keys.Escape))
                 ExecuteCommand(new Command(SceneType.Settings));
+
+            foreach (var guiComponent in GuiComponents)
+                guiComponent.Update(gameTime);
 
             _menu.Update(_inputManager);
         }
@@ -48,6 +59,8 @@ namespace conc.game.scenes
         {
             spriteBatch.Begin();
             _menu.Draw(spriteBatch);
+            foreach (var guiComponent in GuiComponents)
+                guiComponent.Draw(spriteBatch);
             spriteBatch.End();
         }
     }

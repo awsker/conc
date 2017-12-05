@@ -1,15 +1,15 @@
 ﻿namespace conc.game.gui.components
 {
-    public interface ISliderComponent
+    public interface ISlider
     {
         float Min { get; }
         float Max { get; }
         float Current { get; }
     }
 
-    public class SliderComponent : ISliderComponent
+    public class Slider : ISlider
     {
-        public SliderComponent(int row, int col, float min, float max)
+        public Slider(int row, int col, float min, float max)
         {
             Min = min;
             Max = max;

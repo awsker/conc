@@ -29,6 +29,7 @@ namespace conc.game
         private readonly InputManager _inputManager;
         private VideoModeManager _videoManager;
         private ColorManager _colorManager;
+        private IConfigManager _configManager;
 
         private IScene _scene;
         private IScene _nextScene;
@@ -44,6 +45,8 @@ namespace conc.game
             _game.IsFixedTimeStep = false;
             _contentManager = new ContentManager(game.Services, "content");
             _inputManager = new InputManager(numPlayers: 1);
+            _configManager = new ConfigManager();
+            _configManager.WriteDefaultConfig();
             initVideoManager();
         }
         #endregion
@@ -174,6 +177,9 @@ namespace conc.game
 
             //var audioScene = new AudioScene(this);
             //SetScene(audioScene);
+
+            //var controlScene = new ControlScene(this);
+            //SetScene(controlScene);
         }
         
         public override void Update(GameTime gameTime)

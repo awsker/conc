@@ -66,9 +66,16 @@
     <Compile Include="game\extensions\RectangleExtension.cs" />
     <Compile Include="game\GameManager.cs" />
     <Compile Include="game\GameSettings.cs" />
-    <Compile Include="game\gui\baseclass\GuiComponent.cs" />
-    <Compile Include="game\gui\Label.cs" />
-    <Compile Include="game\gui\Panel.cs" />
+    <Compile Include="game\gui\AudioSettingsPanel.cs" />
+    <Compile Include="game\gui\ComboBoxRow.cs" />
+    <Compile Include="game\gui\components\GuiComponent.cs" />
+    <Compile Include="game\gui\components\Label.cs" />
+    <Compile Include="game\gui\components\Panel.cs" />
+    <Compile Include="game\gui\ControlSettingsPanel.cs" />
+    <Compile Include="game\gui\KeybindRow.cs" />
+    <Compile Include="game\gui\SettingsPanel.cs" />
+    <Compile Include="game\gui\SettingsPanelRow.cs" />
+    <Compile Include="game\gui\SliderRow.cs" />
     <Compile Include="game\input\ButtonsContainer.cs" />
     <Compile Include="game\input\IInputDevice.cs" />
     <Compile Include="game\input\InputManager.cs" />
@@ -80,8 +87,8 @@
     <Compile Include="game\scenes\baseclass\Camera.cs" />
     <Compile Include="game\scenes\baseclass\Menu.cs" />
     <Compile Include="game\scenes\baseclass\Scene.cs" />
-    <Compile Include="game\gui\components\ComboBoxComponent.cs" />
-    <Compile Include="game\gui\components\SliderComponent.cs" />
+    <Compile Include="game\gui\components\ComboBox.cs" />
+    <Compile Include="game\gui\components\Slider.cs" />
     <Compile Include="game\scenes\ControlScene.cs" />
     <Compile Include="game\scenes\GameScene.cs" />
     <Compile Include="game\scenes\MainMenuScene.cs" />
@@ -89,6 +96,7 @@
     <Compile Include="game\scenes\SettingsScene.cs" />
     <Compile Include="game\scenes\VideoScene.cs" />
     <Compile Include="game\util\ColorManager.cs" />
+    <Compile Include="game\util\ConfigManager.cs" />
     <Compile Include="game\util\GameDebug.cs" />
     <Compile Include="game\extensions\SpriteBatchExtension.cs" />
     <Compile Include="game\extensions\Vector2Extension.cs" />
@@ -101,6 +109,7 @@
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />

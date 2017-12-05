@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using conc.game.commands;
 using conc.game.entity.baseclass;
-using conc.game.gui.baseclass;
+using conc.game.gui.components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

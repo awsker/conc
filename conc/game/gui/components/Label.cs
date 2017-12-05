@@ -1,10 +1,8 @@
-﻿using System;
-using conc.game.gui.baseclass;
-using conc.game.util;
+﻿using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace conc.game.gui
+namespace conc.game.gui.components
 {
     public interface ILabel : IGuiComponent
     {
@@ -19,6 +17,7 @@ namespace conc.game.gui
         public Label(ColorManager colorManager, SpriteFont font) : base(colorManager)
         {
             _font = font;
+            ForegroundColor = Color.White;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
