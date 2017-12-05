@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace tile
 {
@@ -13,6 +14,7 @@ namespace tile
         int FirstGid { get; }
         int TileCount { get; }
         TileProperties[] Tiles { get; }
+        Texture2D Texture { get; set; }
 
     }
 
@@ -46,6 +48,7 @@ namespace tile
         [DataMember]
         public int Rows { get; set; }
         public TileProperties[] Tiles { get; }
+        public Texture2D Texture { get; set; }
     }
 
     public class TileProperties : Dictionary<string, string>{}

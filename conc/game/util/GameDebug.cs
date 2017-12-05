@@ -30,6 +30,12 @@ namespace conc.game.util
             return value;
         }
 
+        public static double Log(string title, double value)
+        {
+            Messages.Add($"{title}: {value}");
+            return value;
+        }
+
         public static Vector2 Log(string title, Vector2 value)
         {
             Messages.Add($"{title}: X={value.X:0.00}, Y={value.Y:0.00}");

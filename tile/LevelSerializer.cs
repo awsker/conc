@@ -80,6 +80,14 @@ namespace tile
                 return true;
             }
 
+            if (type == typeof(Checkpoint))
+            {
+                var dictionary = new XmlDictionary();
+                typeName = dictionary.Add("Checkpoint");
+                typeNamespace = dictionary.Add("tile");
+                return true;
+            }
+
             return knownTypeResolver.TryResolveType(type, declaredType, knownTypeResolver, out typeName, out typeNamespace);
         }
 
@@ -87,9 +95,12 @@ namespace tile
         {
             if (typeName == "Tile" && typeNamespace == "tile")
                 return typeof(Tile);
-            
+
             if (typeName == "Tileset" && typeNamespace == "tile")
                 return typeof(Tileset);
+
+            if (typeName == "Checkpoint" && typeNamespace == "tile")
+                return typeof(Checkpoint);
 
             return knownTypeResolver.ResolveName(typeName, typeNamespace, declaredType, knownTypeResolver);
         }

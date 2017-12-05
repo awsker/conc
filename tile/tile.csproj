@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferData.cs" />
+    <Compile Include="Checkpoint.cs" />
     <Compile Include="LevelSerializer.cs" />
     <Compile Include="math\IPolygon.cs" />
     <Compile Include="math\Line.cs" />

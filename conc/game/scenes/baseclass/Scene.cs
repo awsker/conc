@@ -4,6 +4,7 @@ using conc.game.commands;
 using conc.game.entity.baseclass;
 using conc.game.gui.components;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace conc.game.scenes.baseclass
@@ -43,6 +44,7 @@ namespace conc.game.scenes.baseclass
         {
             _entities.Add(entity);
             entity.Scene = this;
+            entity.LoadContent(_gameManager.Get<ContentManager>());
         }
 
         public IList<IGuiComponent> GuiComponents { get; }
@@ -51,15 +53,22 @@ namespace conc.game.scenes.baseclass
 
         public virtual void LoadContent() { }
 
-        public virtual void Update(GameTime gameTime)
+        public virtual void RemoveDestroyedEntities()
         {
             //Remove all destroyed entities
             for (int i = _entities.Count - 1; i >= 0; --i)
             {
-                if(_entities[i].IsDestroyed)
+                if (_entities[i].IsDestroyed)
                     _entities.RemoveAt(i);
             }
         }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            RemoveDestroyedEntities();
+        }
+
+
         public virtual void Draw(SpriteBatch spriteBatch) { }
     }
 }

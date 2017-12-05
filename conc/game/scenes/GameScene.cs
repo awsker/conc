@@ -23,7 +23,6 @@ namespace conc.game.scenes
     public class GameScene : Scene, IGameScene
     {
         private ILevel _level;
-        private Texture2D[] _tilesetTextures;
         private ICamera _camera;
         private ContentManager _contentManager;
         private InputManager _inputManager;
@@ -62,12 +61,13 @@ namespace conc.game.scenes
             }
 
             _camera.Update(gameTime);
+
+            RemoveDestroyedEntities();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null,
-                _camera.Transform);
+            spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, _camera.Transform);
 
             DrawLevel(spriteBatch);
 
@@ -79,49 +79,27 @@ namespace conc.game.scenes
 
         private void DrawLevel(SpriteBatch spriteBatch)
         {
-            var playerX = (int)_player.Transform.Position.X / GameSettings.TileSize;
-            var playerY = (int)_player.Transform.Position.Y / GameSettings.TileSize;
-
-            for (var y = playerY - GameSettings.DrawTileAmount; y <= playerY + GameSettings.DrawTileAmount; y++)
-            {
-                for (var x = playerX - GameSettings.DrawTileAmount; x <= playerX + GameSettings.DrawTileAmount; x++)
-                {
-                    if (x < 0 || y < 0 || x >= _level.Width || y >= _level.Height)
-                        continue;
-
-                    var tile = _level.Tiles[x, y];
-
-                    if (tile != null)
-                    {
-                        var tileset = _level.Tilesets[tile.TilesetIndex];
-                        spriteBatch.Draw(_tilesetTextures[tile.TilesetIndex], new Vector2(tile.X * tileset.TileWidth, tile.Y * tileset.TileHeight), tile.Source, Color.White);
-                    }
-                }
-            }
+            _level.DrawLevel(spriteBatch.GraphicsDevice);
         }
-
+       
         public void SetLevel(ILevel level)
         {
             _entities.Clear();
             _level = level;
 
-            var tilesetPath = @"tilesets\";
-            _tilesetTextures = new Texture2D[_level.Tilesets.Length];
-            for (int i = 0; i < _level.Tilesets.Length; ++i)
-            {
-                var tileset = _level.Tilesets[i];
-                _tilesetTextures[i] = _contentManager.Load<Texture2D>(tilesetPath + tileset.Source);
-            }
+            _level.LoadContent(GameManager.GraphicsDevice, GameManager.Get<ContentManager>());
 
             _animationReader = new AnimationReader();
             _animationReader.LoadAllTemplates();
             
-            _player = new Player(new Vector2(_level.Start.X + _level.Start.Width/2f, _level.Start.Top), _animationReader.GetAnimator("Player"));
-            _player.LoadContent(_contentManager);
+            _player = new Player(new Vector2(_level.Start.X, _level.Start.Y), _animationReader.GetAnimator("Player"));
             AddEntity(_player);
 
-            _camera = new Camera(_videoManager.GraphicsDeviceManager);
-            _camera.SetTarget(_player);
+            var camera = new Camera(_videoManager.GraphicsDeviceManager);
+            camera.SetTarget(_player);
+            camera.SetLevel(level);
+            camera.KeepCameraInsideBounds = true;
+            _camera = camera;
         }
 
         public ILevel CurrentLevel => _level;
