@@ -15,6 +15,7 @@ namespace conc.game.gui
     {
         event Action<Command> ExecuteCommand;
         void AddRow(ISettingsPanelRow row);
+        bool HasFocus { get; }
     }
 
     public abstract class SettingsPanel : Panel, ISettingsPanel
@@ -24,6 +25,7 @@ namespace conc.game.gui
         protected readonly IList<ISettingsPanelRow> _rows;
         protected readonly InputManager _inputManager;
         protected SpriteFont _font;
+        private ISettingsPanelRow _currentRow;
 
         protected SettingsPanel(ColorManager colorManager, InputManager inputManger, SpriteFont font) : base(colorManager)
         {
@@ -40,8 +42,9 @@ namespace conc.game.gui
             row.Position = new Vector2(10, 10 + _rows.Count * row.Size.Y + _rows.Count * 4);
             _rows.Add(row);
             AddChild(row);
-            
         }
+
+        public bool HasFocus => _rows.Any(x => x.Activated);
 
         public override void Update(GameTime gameTime)
         {
@@ -50,7 +53,10 @@ namespace conc.game.gui
                 row.Update(gameTime);
                 if (_inputManager.IsMouseDownOverBounds(row.FocusBounds, 0))
                 {
+                    _currentRow?.Deactivate();
+
                     row.Activate();
+                    _currentRow = row;
                 }
 
                 var nextKey = _inputManager.GetNextKeyPress();
@@ -61,7 +67,7 @@ namespace conc.game.gui
                     {
                         if (nextKey == Keys.Escape)
                         {
-                            keybindRow.RestoreKey();
+                            keybindRow.Deactivate();
                             return;
                         }
 

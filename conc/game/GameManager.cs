@@ -168,10 +168,10 @@ namespace conc.game
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
             _colorManager = new ColorManager(GraphicsDevice);
 
-            var gamescene = new GameScene(this);
-            SetScene(gamescene);
+            //var gamescene = new GameScene(this);
+            //SetScene(gamescene);
 
-            gamescene.SetLevel(_levels[0]);
+            //gamescene.SetLevel(_levels[0]);
 
             //var menuScene = new MainMenuScene(this);
             //SetScene(menuScene);
@@ -179,8 +179,8 @@ namespace conc.game
             //var audioScene = new AudioScene(this);
             //SetScene(audioScene);
 
-            //var controlScene = new ControlScene(this);
-            //SetScene(controlScene);
+            var controlScene = new ControlScene(this);
+            SetScene(controlScene);
         }
         
         public override void Update(GameTime gameTime)

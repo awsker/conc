@@ -17,6 +17,7 @@ namespace conc.game.scenes.baseclass
         void Draw(SpriteBatch spriteBatch);
         void AddEntity(IEntity entity);
         IList<IGuiComponent> GuiComponents { get; }
+        bool HasFocus { get; }
     }
 
     public abstract class Scene : IScene
@@ -48,6 +49,7 @@ namespace conc.game.scenes.baseclass
         }
 
         public IList<IGuiComponent> GuiComponents { get; }
+        public virtual bool HasFocus => true;
 
         public GameManager GameManager => _gameManager;
 

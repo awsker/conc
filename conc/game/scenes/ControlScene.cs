@@ -21,6 +21,8 @@ namespace conc.game.scenes
         private ContentManager _contentManager;
         private InputManager _inputManager;
 
+        private IControlSettingsPanel _controlSettingsPanel;
+
         public ControlScene(GameManager gameManager) : base(gameManager)
         {
             _menu = new Menu(new Vector2(GameSettings.TargetWidth - 50f, GameSettings.TargetHeight - 50f));
@@ -40,14 +42,14 @@ namespace conc.game.scenes
             var colorManager = _gameManager.Get<ColorManager>();
             var font = _contentManager.Load<SpriteFont>("fonts/menu");
 
-            var controlSettingsPanel = new ControlSettingsPanel(colorManager, _inputManager, font);
-            controlSettingsPanel.ExecuteCommand += ExecuteCommand;
-            GuiComponents.Add(controlSettingsPanel);
+            _controlSettingsPanel = new ControlSettingsPanel(colorManager, _inputManager, font);
+            _controlSettingsPanel.ExecuteCommand += ExecuteCommand;
+            GuiComponents.Add(_controlSettingsPanel);
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (_inputManager.IsPressed(Keys.Escape))
+            if (HasFocus && _inputManager.IsPressed(Keys.Escape))
                 ExecuteCommand(new Command(SceneType.Settings));
 
             foreach (var guiComponent in GuiComponents)
@@ -64,5 +66,7 @@ namespace conc.game.scenes
                 guiComponent.Draw(spriteBatch);
             spriteBatch.End();
         }
+
+        public override bool HasFocus => !_controlSettingsPanel.HasFocus;
     }
 }

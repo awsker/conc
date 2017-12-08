@@ -56,7 +56,7 @@ namespace conc.game.gui
             _activated = true;
         }
 
-        public void Deactivate()
+        public virtual void Deactivate()
         {
             _activated = false;
         }

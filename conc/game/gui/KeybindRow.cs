@@ -11,7 +11,6 @@ namespace conc.game.gui
     {
         void SetKey(Keys? key);
         void SetText(string text);
-        void RestoreKey();
         ControlButtons ControlButton { get; }
     }
 
@@ -51,6 +50,7 @@ namespace conc.game.gui
             }
             
             _keyLabel.Text = _key.ToString();
+            _previousText = _keyLabel.Text;
         }
 
         public void SetText(string text)
@@ -59,9 +59,10 @@ namespace conc.game.gui
                 _keyLabel.Text = text;
         }
 
-        public void RestoreKey()
+        public override void Deactivate()
         {
             _keyLabel.Text = _previousText;
+            base.Deactivate();
         }
 
         public ControlButtons ControlButton { get; }

@@ -222,8 +222,8 @@ namespace conc.game.input
 
             foreach (var line in config)
             {
-                var controlButton = (ControlButtons)Enum.Parse(typeof(ControlButtons), line.Split('=')[0]);
-                var key = (Keys)Enum.Parse(typeof(Keys), line.Split('=')[1]);
+                var controlButton = (ControlButtons)Enum.Parse(typeof(ControlButtons), line.Trim().Split('=')[0]);
+                var key = (Keys)Enum.Parse(typeof(Keys), line.Split('=')[1], true);
 
                 ret.Add(controlButton, key);
             }
