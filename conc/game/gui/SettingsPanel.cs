@@ -37,8 +37,7 @@ namespace conc.game.gui
 
         public void AddRow(ISettingsPanelRow row)
         {
-            row.Parent = this;
-            row.Size = new Vector2(Size.X - 20, 30);
+            row.Size = new Vector2(Size.X - 20, 40);
             row.Position = new Vector2(10, 10 + _rows.Count * row.Size.Y + _rows.Count * 4);
             _rows.Add(row);
             AddChild(row);
@@ -48,37 +47,75 @@ namespace conc.game.gui
 
         public override void Update(GameTime gameTime)
         {
+            GameDebug.Log("MP", Mouse.GetState().Position);
+
             foreach (var row in _rows)
             {
                 row.Update(gameTime);
-                if (_inputManager.IsMouseDownOverBounds(row.FocusBounds, 0))
-                {
-                    _currentRow?.Deactivate();
-
-                    row.Activate();
-                    _currentRow = row;
-                }
-
-                var nextKey = _inputManager.GetNextKeyPress();
 
                 if (row is KeybindRow keybindRow)
                 {
+                    var nextKey = _inputManager.GetNextKeyPress();
+                    var nextMouseKey = _inputManager.GetNextMouseKeyPress();
+
+                    if (nextKey == Keys.Delete && keybindRow.Key1Highlighted)
+                    {
+                        keybindRow.SetKey1(string.Empty);
+                        ExecuteCommand?.Invoke(new Command(keybindRow.ControlButton, keybindRow.Key1Text, keybindRow.Key2Text));
+                        return;
+                    }
+
+                    if (nextKey == Keys.Delete && keybindRow.Key2Highlighted)
+                    {
+                        keybindRow.SetKey2(string.Empty);
+                        ExecuteCommand?.Invoke(new Command(keybindRow.ControlButton, keybindRow.Key1Text, keybindRow.Key2Text));
+                        return;
+                    }
+
+                    if (!keybindRow.Activated)
+                    {
+                        if (_inputManager.IsMouseDownOverBounds(keybindRow.Key1Bounds, 0))
+                        {
+                            keybindRow.Key1Activated = true;
+                            keybindRow.SetKey1Text("press key");
+                            _currentRow = keybindRow;
+                            return;
+                        }
+                        if (_inputManager.IsMouseDownOverBounds(keybindRow.Key2Bounds, 0))
+                        {
+                            keybindRow.Key2Activated = true;
+                            keybindRow.SetKey2Text("press key");
+                            _currentRow = keybindRow;
+                            return;
+                        }
+                    }
+
                     if (keybindRow.Activated)
                     {
                         if (nextKey == Keys.Escape)
                         {
-                            keybindRow.Deactivate();
+                            keybindRow.Key1Activated = false;
+                            keybindRow.Key2Activated = false;
                             return;
                         }
 
-                        keybindRow.SetText("press key");
-
-                        if (keybindRow.Activated && nextKey != Keys.None)
+                        if (keybindRow.Activated && (nextKey != Keys.None || nextMouseKey != MouseKeys.None))
                         {
-                            keybindRow.SetKey(nextKey);
-                            keybindRow.Deactivate();
+                            var keyText = string.Empty;
+                            if (nextKey != Keys.None)
+                                keyText = nextKey.ToString();
+                            if (nextMouseKey != MouseKeys.None)
+                                keyText = nextMouseKey.ToString();
 
-                            ExecuteCommand?.Invoke(new Command(keybindRow.ControlButton, nextKey));
+                            if (keybindRow.Key1Activated)
+                                keybindRow.SetKey1(keyText);
+                            else if (keybindRow.Key2Activated)
+                                keybindRow.SetKey2(keyText);
+
+                            keybindRow.Key1Activated = false;
+                            keybindRow.Key2Activated = false;
+
+                            ExecuteCommand?.Invoke(new Command(keybindRow.ControlButton, keybindRow.Key1Text, keybindRow.Key2Text));
                         }
                     }
                 }

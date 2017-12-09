@@ -71,12 +71,14 @@ namespace conc.game.scenes.baseclass
         public void Update(InputManager inputManager)
         {
             var mousePosition = inputManager.GetMousePosition();
+            var nextKeyPress = inputManager.GetNextKeyPress();
+
             if (mousePosition != _previousMousePosition)
             {
                 _controlMode = ControlMode.Mouse;
                 ExecuteCommand?.Invoke(new Command(CommandType.ShowCursor));
             }
-            else if (inputManager.IsAnyButtonPressed(0) && !inputManager.IsDown(Mouse.GetState().LeftButton))
+            else if (nextKeyPress != Keys.None && nextKeyPress != Keys.Escape && nextKeyPress != Keys.Delete && !inputManager.IsDown(MouseKeys.MouseLeft))
             {
                 if (_controlMode == ControlMode.Mouse)
                     _keyboardActivated = true;
@@ -109,7 +111,7 @@ namespace conc.game.scenes.baseclass
                 {
                     if (menuItem.HasContent() && menuItem.Bounds.Intersects(mousePosition))
                     {
-                        if (inputManager.IsPressed(ControlButtons.FireRope, 0))
+                        if (inputManager.IsPressed(ControlButtons.FireRope, 0) || inputManager.IsPressed(MouseKeys.MouseLeft))
                             ExecuteCommand?.Invoke(menuItem.Command);
 
                         menuItem.Highlight = true;

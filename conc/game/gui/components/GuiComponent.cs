@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,6 +29,8 @@ namespace conc.game.gui.components
         Color ForegroundColor { get; set; }
 
         Rectangle Bounds { get; }
+
+        void OnResize();
     }
 
     public abstract class GuiComponent : IGuiComponent
@@ -35,6 +38,7 @@ namespace conc.game.gui.components
         private Vector2 _position;
         protected readonly ColorManager _colorManager;
         private readonly IList<IGuiComponent> _children;
+        private Vector2 _size;
 
         protected GuiComponent(ColorManager colorManager)
         {
@@ -43,6 +47,7 @@ namespace conc.game.gui.components
             Margin = new Margin(0f, 0f, 0f, 0f);
             BackgroundColor = Color.White;
             ForegroundColor = Color.Black;
+            Alpha = 1f;
         }
 
         public virtual void Update(GameTime gameTime)
@@ -65,7 +70,19 @@ namespace conc.game.gui.components
             set => _position = value;
         }
 
-        public Vector2 Size { get; set; }
+        public Vector2 Size
+        {
+            get => _size;
+            set
+            {
+                if (_size == value)
+                    return;
+
+                _size = value;
+                OnResize();
+            }
+        }
+
         public float Alpha { get; set; }
 
         public void AddChild(IGuiComponent child)
@@ -80,7 +97,9 @@ namespace conc.game.gui.components
         public Color BackgroundColor { get; set; }
         public Color ForegroundColor { get; set; }
 
-        public Rectangle Bounds => new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+        public Rectangle Bounds => new Rectangle((int)AlignedPosition.X, (int)AlignedPosition.Y, (int)Size.X, (int)Size.Y);
+
+        public virtual void OnResize() { }
 
         protected Vector2 AlignedPosition
         {

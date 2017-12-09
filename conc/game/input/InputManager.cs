@@ -17,7 +17,7 @@ namespace conc.game.input
 
         private PlayerInput[] _players;
         private IDictionary<Keys, uint> _keyboardKeys;
-        private IDictionary<ButtonState, uint> _mouseKeys;
+        private IDictionary<MouseKeys, uint> _mouseKeys;
 
         private KeyboardInput _keyboardInput;
 
@@ -43,20 +43,25 @@ namespace conc.game.input
             return _players[playerIndex].IsPressed(button);
         }
 
-        public bool IsAnyButtonPressed(int playerIndex)
-        {
-            foreach (var button in Enum.GetValues(typeof(ControlButtons)))
-            {
-                if (_players[playerIndex].IsPressed((ControlButtons) button))
-                    return true;
-            }
-
-            return false;
-        }
-
         public Keys GetNextKeyPress()
         {
-            return Keyboard.GetState().GetPressedKeys().FirstOrDefault();
+            var firstKey = Keyboard.GetState().GetPressedKeys().FirstOrDefault();
+            if (IsPressed(firstKey))
+                return firstKey;
+
+            return Keys.None;
+        }
+
+        public MouseKeys GetNextMouseKeyPress()
+        {
+            if (IsPressed(MouseKeys.MouseLeft))
+                return MouseKeys.MouseLeft;
+            if (IsPressed(MouseKeys.MouseMiddle))
+                return MouseKeys.MouseMiddle;
+            if (IsPressed(MouseKeys.MouseRight))
+                return MouseKeys.MouseRight;
+
+            return MouseKeys.None;
         }
 
         public bool IsUp(ControlButtons button, int playerIndex)
@@ -87,25 +92,25 @@ namespace conc.game.input
             return _keyboardKeys[key] == 0;
         }
 
-        public bool IsDown(ButtonState button)
+        public bool IsDown(MouseKeys key)
         {
-            return _mouseKeys[button] > 0;
+            return _mouseKeys[key] > 0;
         }
 
-        public bool IsPressed(ButtonState button)
+        public bool IsPressed(MouseKeys key)
         {
-            return _mouseKeys[button] == 1;
+            return _mouseKeys[key] == 1;
         }
 
-        public bool IsUp(ButtonState button)
+        public bool IsUp(MouseKeys key)
         {
-            return _mouseKeys[button] == 0;
+            return _mouseKeys[key] == 0;
         }
 
         public bool IsMouseDownOverBounds(Rectangle bounds, int playerIndex)
         {
             var mouseState = Mouse.GetState();
-            return bounds.Intersects(mouseState.Position) && IsPressed(ControlButtons.FireRope, playerIndex);
+            return bounds.Intersects(mouseState.Position) && IsPressed(MouseKeys.MouseLeft);
         }
 
         public Point GetMousePosition()
@@ -123,7 +128,7 @@ namespace conc.game.input
             _keyboardInput.Keybinds = GetKeybinds();
 
             _players[0].InputDevices.Add(_keyboardInput);
-            _players[0].InputDevices.Add(new MouseInput());
+            //_players[0].InputDevices.Add(new MouseInput());
         }
 
         private void initKeyboardKeys()
@@ -137,11 +142,9 @@ namespace conc.game.input
 
         private void initMouseButtons()
         {
-            _mouseKeys = new Dictionary<ButtonState, uint>();
-            foreach (ButtonState button in Enum.GetValues(typeof(ButtonState)))
-            {
-                _mouseKeys[button] = 0;
-            }
+            _mouseKeys = new Dictionary<MouseKeys, uint>();
+            foreach (MouseKeys key in Enum.GetValues(typeof(MouseKeys)))
+                _mouseKeys[key] = 0;
         }
 
         private void updateKeyboardPress()
@@ -161,15 +164,27 @@ namespace conc.game.input
 
         private void updateMousePress()
         {
-            foreach (ButtonState button in Enum.GetValues(typeof(ButtonState)))
+            foreach (MouseKeys mouseKey in Enum.GetValues(typeof(MouseKeys)))
             {
-                if (Mouse.GetState().LeftButton == button)
+                var mouseState = Mouse.GetState();
+                switch (mouseKey)
                 {
-                    ++_mouseKeys[button];
-                }
-                else
-                {
-                    _mouseKeys[button] = 0;
+                    case MouseKeys.None:
+                        break;
+                    case MouseKeys.MouseLeft:
+                        if (mouseState.LeftButton == ButtonState.Pressed) ++_mouseKeys[mouseKey];
+                        else _mouseKeys[mouseKey] = 0;
+                        break;
+                    case MouseKeys.MouseMiddle:
+                        if (mouseState.MiddleButton == ButtonState.Pressed) ++_mouseKeys[mouseKey];
+                        else _mouseKeys[mouseKey] = 0;
+                        break;
+                    case MouseKeys.MouseRight:
+                        if (mouseState.RightButton == ButtonState.Pressed) ++_mouseKeys[mouseKey];
+                        else _mouseKeys[mouseKey] = 0;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
@@ -182,17 +197,17 @@ namespace conc.game.input
             using (var file = new StreamWriter(_fileName))
             {
                 file.WriteLine(ControlButtons.MoveUp + "=" + Keys.W);
-                file.WriteLine(ControlButtons.MoveDown + "=" + Keys.A);
-                file.WriteLine(ControlButtons.MoveLeft + "=" + Keys.S);
+                file.WriteLine(ControlButtons.MoveDown + "=" + Keys.S);
+                file.WriteLine(ControlButtons.MoveLeft + "=" + Keys.A);
                 file.WriteLine(ControlButtons.MoveRight + "=" + Keys.D);
-                file.WriteLine(ControlButtons.FireRope + "=" + Keys.Space);
-                file.WriteLine(ControlButtons.Jump + "=" + Keys.LeftShift);
+                file.WriteLine(ControlButtons.FireRope + "=" + Keys.LeftShift);
+                file.WriteLine(ControlButtons.Jump + "=" + Keys.Space);
             }
 
             _keyboardInput.Keybinds = GetKeybinds();
         }
 
-        public void WriteConfigWithNewKey(ControlButtons button, Keys key)
+        public void WriteConfigWithNewKey(ControlButtons controlButton, string key1, string key2)
         {
             if (!File.Exists(_fileName))
                 WriteDefaultConfig();
@@ -202,8 +217,8 @@ namespace conc.game.input
             for (var i = 0; i < config.Length; i++)
             {
                 var line = config[i];
-                if (line.StartsWith(button.ToString()))
-                    config[i] = button + "=" + key;
+                if (line.StartsWith(controlButton.ToString()))
+                    config[i] = controlButton + "=" + key1 + (key2 != string.Empty ? "," + key2 : string.Empty);
             }
 
             File.WriteAllLines(_fileName, config);
@@ -211,9 +226,9 @@ namespace conc.game.input
             _keyboardInput.Keybinds = GetKeybinds();
         }
 
-        public Dictionary<ControlButtons, Keys> GetKeybinds()
+        public Dictionary<ControlButtons, Tuple<GenericKey, GenericKey>> GetKeybinds()
         {
-            var ret = new Dictionary<ControlButtons, Keys>();
+            var ret = new Dictionary<ControlButtons, Tuple<GenericKey, GenericKey>>();
 
             if (!File.Exists(_fileName))
                 return ret;
@@ -222,10 +237,63 @@ namespace conc.game.input
 
             foreach (var line in config)
             {
-                var controlButton = (ControlButtons)Enum.Parse(typeof(ControlButtons), line.Trim().Split('=')[0]);
-                var key = (Keys)Enum.Parse(typeof(Keys), line.Split('=')[1], true);
+                var controlButtonLine = line.Trim().Split('=')[0];
+                var keyLine1 = line.Split('=')[1];
 
-                ret.Add(controlButton, key);
+                var keyLine2 = string.Empty;
+                if (keyLine1.Contains(','))
+                {
+                    keyLine2 = keyLine1.Split(',')[1].Trim();
+                    keyLine1 = keyLine1.Split(',')[0].Trim();
+                }
+
+                var controlButton = (ControlButtons)Enum.Parse(typeof(ControlButtons), controlButtonLine);
+
+                GenericKey key1 = null;
+                GenericKey key2 = null;
+
+                Keys? keyboardKey1 = null;
+                if (Enum.TryParse(keyLine1, out Keys tempKeyboardKey1))
+                    keyboardKey1 = tempKeyboardKey1;
+
+                MouseKeys? mouseKey1 = null;
+                if (Enum.TryParse(keyLine1, out MouseKeys tempMouseKey1))
+                    mouseKey1 = tempMouseKey1;
+
+                Buttons? gamepadKey1 = null;
+                if (Enum.TryParse(keyLine1, out Buttons tempGamepadKey1))
+                    gamepadKey1 = tempGamepadKey1;
+
+                if (keyboardKey1 != null)
+                    key1 = new GenericKey(keyboardKey1);
+                else if (mouseKey1 != null)
+                    key1 = new GenericKey(mouseKey1);
+                else if (gamepadKey1 != null)
+                    key1 = new GenericKey(gamepadKey1);
+
+                if (keyLine2 != string.Empty)
+                {
+                    Keys? keyboardKey2 = null;
+                    if (Enum.TryParse(keyLine2, out Keys tempKeyboardKey2))
+                        keyboardKey2 = tempKeyboardKey2;
+
+                    MouseKeys? mouseKey2 = null;
+                    if (Enum.TryParse(keyLine2, out MouseKeys tempMouseKey2))
+                        mouseKey2 = tempMouseKey2;
+
+                    Buttons? gamepadKey2 = null;
+                    if (Enum.TryParse(keyLine2, out Buttons tempGamepadKey2))
+                        gamepadKey2 = tempGamepadKey2;
+
+                    if (keyboardKey2 != null)
+                        key2 = new GenericKey(keyboardKey2);
+                    else if (mouseKey2 != null)
+                        key2 = new GenericKey(mouseKey2);
+                    else if (gamepadKey2 != null)
+                        key2 = new GenericKey(gamepadKey2);
+                }
+
+                ret.Add(controlButton, Tuple.Create(key1, key2));
             }
 
             return ret;
@@ -235,5 +303,58 @@ namespace conc.game.input
     public enum ControlButtons
     {
         MoveLeft, MoveRight, MoveUp, MoveDown, Jump, FireRope
+    }
+
+    public enum MouseKeys
+    {
+        None,
+        MouseLeft,
+        MouseMiddle,
+        MouseRight
+    }
+
+    public enum KeyType
+    {
+        Keyboard,
+        Mouse,
+        Gamepad
+    }
+
+    public class GenericKey
+    {
+        public GenericKey(Keys? key)
+        {
+            KeyboardKey = key;
+            KeyType = KeyType.Keyboard;
+        }
+
+        public GenericKey(MouseKeys? key)
+        {
+            MouseKey = key;
+            KeyType = KeyType.Mouse;
+        }
+
+        public GenericKey(Buttons? key)
+        {
+            GamepadKey = key;
+            KeyType = KeyType.Gamepad;
+        }
+
+        public KeyType KeyType { get; }
+        public Keys? KeyboardKey { get; }
+        public MouseKeys? MouseKey { get; }
+        public Buttons? GamepadKey { get; }
+
+        public string Text
+        {
+            get
+            {
+                if (KeyType == KeyType.Keyboard)
+                    return KeyboardKey?.ToString();
+                if (KeyType == KeyType.Mouse)
+                    return MouseKey?.ToString();
+                return GamepadKey?.ToString();
+            }       
+        }
     }
 }

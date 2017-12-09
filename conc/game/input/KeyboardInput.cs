@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using System;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
 namespace conc.game.input
@@ -9,8 +10,76 @@ namespace conc.game.input
         {
             foreach (var keybind in Keybinds)
             {
-                if (Keyboard.GetState().IsKeyDown(keybind.Value))
-                    yield return keybind.Key;
+                var key1 = keybind.Value.Item1;
+                var key2 = keybind.Value.Item2;
+
+                if (key1 != null)
+                {
+                    if (key1.KeyType == KeyType.Keyboard)
+                    {
+                        if (key1.KeyboardKey != null)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(key1.KeyboardKey.Value))
+                                yield return keybind.Key;
+                        }
+                    }
+
+                    if (key1.KeyType == KeyType.Mouse)
+                    {
+                        if (key1.MouseKey != null)
+                        {
+                            if (key1.MouseKey.Value == MouseKeys.MouseLeft && Mouse.GetState().LeftButton == ButtonState.Pressed)
+                                yield return keybind.Key;
+                            if (key1.MouseKey.Value == MouseKeys.MouseMiddle && Mouse.GetState().MiddleButton == ButtonState.Pressed)
+                                yield return keybind.Key;
+                            if (key1.MouseKey.Value == MouseKeys.MouseRight && Mouse.GetState().RightButton == ButtonState.Pressed)
+                                yield return keybind.Key;
+                        }
+                    }
+
+                    if (key1.KeyType == KeyType.Gamepad)
+                    {
+                        if (key1.GamepadKey != null)
+                        {
+                            if (GamePad.GetState(0).IsButtonDown(key1.GamepadKey.Value))
+                                yield return keybind.Key;
+                        }
+                    }
+                }
+
+                if (key2 != null)
+                {
+                    if (key2.KeyType == KeyType.Keyboard)
+                    {
+                        if (key2.KeyboardKey != null)
+                        {
+                            if (Keyboard.GetState().IsKeyDown(key2.KeyboardKey.Value))
+                                yield return keybind.Key;
+                        }
+                    }
+
+                    if (key2.KeyType == KeyType.Mouse)
+                    {
+                        if (key2.MouseKey != null)
+                        {
+                            if (key2.MouseKey.Value == MouseKeys.MouseLeft && Mouse.GetState().LeftButton == ButtonState.Pressed)
+                                yield return keybind.Key;
+                            if (key2.MouseKey.Value == MouseKeys.MouseMiddle && Mouse.GetState().MiddleButton == ButtonState.Pressed)
+                                yield return keybind.Key;
+                            if (key2.MouseKey.Value == MouseKeys.MouseRight && Mouse.GetState().RightButton == ButtonState.Pressed)
+                                yield return keybind.Key;
+                        }
+                    }
+
+                    if (key2.KeyType == KeyType.Gamepad)
+                    {
+                        if (key2.GamepadKey != null)
+                        {
+                            if (GamePad.GetState(0).IsButtonDown(key2.GamepadKey.Value))
+                                yield return keybind.Key;
+                        }
+                    }
+                }
             }
 
             //if (Keyboard.GetState().IsKeyDown(Keys.Up))
@@ -47,6 +116,6 @@ namespace conc.game.input
             //    yield return ControlButtons.Jump;
         }
 
-        public Dictionary<ControlButtons, Keys> Keybinds { get; set; } = new Dictionary<ControlButtons, Keys>();
+        public Dictionary<ControlButtons, Tuple<GenericKey, GenericKey>> Keybinds { get; set; } = new Dictionary<ControlButtons, Tuple<GenericKey, GenericKey>>();
     }
 }

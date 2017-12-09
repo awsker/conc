@@ -151,7 +151,7 @@ namespace conc.game
                     _game.IsMouseVisible = false;
                     break;
                 case CommandType.SetKey:
-                    _inputManager.WriteConfigWithNewKey(command.ControlButton, command.Key);
+                    _inputManager.WriteConfigWithNewKey(command.ControlButton, command.Key1, command.Key2);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

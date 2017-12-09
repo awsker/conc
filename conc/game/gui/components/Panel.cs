@@ -10,14 +10,14 @@ namespace conc.game.gui.components
 
     public class Panel : GuiComponent, IPanel
     {
-        protected Panel(ColorManager colorManager) : base(colorManager)
+        public Panel(ColorManager colorManager) : base(colorManager)
         {
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (BackgroundColor != null)
-                spriteBatch.Draw(_colorManager.Get(BackgroundColor), Position, null, Color.White, 0f, Vector2.Zero, Size, SpriteEffects.None, 0f);
+                spriteBatch.Draw(_colorManager.Get(BackgroundColor), AlignedPosition, null, Color.White*Alpha, 0f, Vector2.Zero, Size, SpriteEffects.None, 0f);
 
             base.Draw(spriteBatch);
         }

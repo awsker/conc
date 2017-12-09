@@ -22,10 +22,11 @@ namespace conc.game.commands
             CommandType = commandType;
         }
 
-        public Command(ControlButtons controlButton, Keys key)
+        public Command(ControlButtons controlButton, string key1, string key2)
         {
             ControlButton = controlButton;
-            Key = key;
+            Key1 = key1;
+            Key2 = key2;
             CommandType = CommandType.SetKey;
         }
         
@@ -33,6 +34,7 @@ namespace conc.game.commands
         public SceneType SceneType { get; }
 
         public ControlButtons ControlButton { get; }
-        public Keys Key { get; }
+        public string Key1 { get; }
+        public string Key2 { get; }
     }
 }
