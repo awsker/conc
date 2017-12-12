@@ -51,8 +51,7 @@ namespace conc.game.entity
         public override void LoadContent(ContentManager contentManager)
         {
             base.LoadContent(contentManager);
-            var cm = Scene.GameManager.Get<ColorManager>();
-            _ropeTex = cm.Get(Color.Aquamarine);
+            _ropeTex = ColorTextureFactory.Get(Color.Aquamarine);
         }
 
         public CollisionSettings CollisionSettings { get; }

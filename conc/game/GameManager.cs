@@ -28,7 +28,6 @@ namespace conc.game
         private SpriteBatch _spriteBatch;
         private readonly InputManager _inputManager;
         private VideoModeManager _videoManager;
-        private ColorManager _colorManager;
 
         private IScene _scene;
         private IScene _nextScene;
@@ -86,8 +85,6 @@ namespace conc.game
                 return (T)Convert.ChangeType(_contentManager, typeof(T));
             if (_videoManager is T)
                 return (T)Convert.ChangeType(_videoManager, typeof(T));
-            if (_colorManager is T)
-                return (T)Convert.ChangeType(_colorManager, typeof(T));
 
             throw new Exception("No manager found");
         }
@@ -166,12 +163,12 @@ namespace conc.game
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _levels = LevelSerializer.DeSerialize();
             _debugFont = _contentManager.Load<SpriteFont>("fonts/debug");
-            _colorManager = new ColorManager(GraphicsDevice);
+            ColorTextureFactory.Initialize(GraphicsDevice);
 
-            //var gamescene = new GameScene(this);
-            //SetScene(gamescene);
+            var gamescene = new GameScene(this);
+            SetScene(gamescene);
 
-            //gamescene.SetLevel(_levels[0]);
+            gamescene.SetLevel(_levels[0]);
 
             //var menuScene = new MainMenuScene(this);
             //SetScene(menuScene);
@@ -179,18 +176,13 @@ namespace conc.game
             //var audioScene = new AudioScene(this);
             //SetScene(audioScene);
 
-            var controlScene = new ControlScene(this);
-            SetScene(controlScene);
+            //var controlScene = new ControlScene(this);
+            //SetScene(controlScene);
         }
         
         public override void Update(GameTime gameTime)
         {
             _inputManager.Update();
-            //if (_inputManager.IsPressed(Keys.Escape))
-            //{
-            //    _game.Exit();
-            //    return;
-            //}
             
             if (_inputManager.IsPressed(Keys.F11))
                 _videoManager.ToggleFullscreen();

@@ -1,4 +1,5 @@
-﻿using conc.game.util;
+﻿using conc.game.input;
+using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,7 +11,7 @@ namespace conc.game.gui
 
     public class ComboBoxRow : SettingsPanelRow, IComboBoxRow
     {
-        public ComboBoxRow(ColorManager colorManager, SpriteFont font, string title) : base(colorManager, font, title)
+        public ComboBoxRow(InputManager inputManager, SpriteFont font, string title) : base(inputManager, font, title)
         {
         }
 

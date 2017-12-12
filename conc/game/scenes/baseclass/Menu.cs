@@ -17,6 +17,8 @@ namespace conc.game.scenes.baseclass
         void LoadContent(ContentManager contentManager, Tuple<string, Command>[] items);
         void Update(InputManager inputManager);
         void Draw(SpriteBatch spriteBatch);
+
+        void InputHandled();
     }
 
     public class Menu : IMenu
@@ -31,6 +33,8 @@ namespace conc.game.scenes.baseclass
 
         private SpriteFont _font;
         private IList<MenuItem> _items;
+
+        private bool _inputHandled;
 
         public Menu(Vector2 position)
         {
@@ -70,6 +74,12 @@ namespace conc.game.scenes.baseclass
 
         public void Update(InputManager inputManager)
         {
+            if (_inputHandled)
+            {
+                _inputHandled = false;
+                return;
+            }
+
             var mousePosition = inputManager.GetMousePosition();
             var nextKeyPress = inputManager.GetNextKeyPress();
 
@@ -135,6 +145,11 @@ namespace conc.game.scenes.baseclass
         {
             foreach (var menuItem in _items)
                 spriteBatch.DrawString(_font, menuItem.Text, menuItem.Position, menuItem.Highlight ? Color.Bisque : Color.White);
+        }
+
+        public void InputHandled()
+        {
+            _inputHandled = true;
         }
     }
 

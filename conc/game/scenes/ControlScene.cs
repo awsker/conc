@@ -39,11 +39,10 @@ namespace conc.game.scenes
                 new Tuple<string, Command>("Back", new Command(SceneType.Settings))
             });
 
-            var colorManager = _gameManager.Get<ColorManager>();
             var font = _contentManager.Load<SpriteFont>("fonts/menu");
 
-            _controlSettingsPanel = new ControlSettingsPanel(colorManager, _inputManager, font);
-            _controlSettingsPanel.ExecuteCommand += ExecuteCommand;
+            _controlSettingsPanel = new ControlSettingsPanel(_inputManager, font);
+            _controlSettingsPanel.OnExecuteCommand += ExecuteCommand;
             GuiComponents.Add(_controlSettingsPanel);
         }
 

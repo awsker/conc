@@ -95,7 +95,7 @@
     <Compile Include="game\scenes\SceneType.cs" />
     <Compile Include="game\scenes\SettingsScene.cs" />
     <Compile Include="game\scenes\VideoScene.cs" />
-    <Compile Include="game\util\ColorManager.cs" />
+    <Compile Include="game\util\ColorTextureFactory.cs" />
     <Compile Include="game\util\GameDebug.cs" />
     <Compile Include="game\extensions\SpriteBatchExtension.cs" />
     <Compile Include="game\extensions\Vector2Extension.cs" />

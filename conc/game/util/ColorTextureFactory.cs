@@ -4,18 +4,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace conc.game.util
 {
-    public class ColorManager
+    public static class ColorTextureFactory
     {
-        private readonly GraphicsDevice _graphicsDevice;
-        private readonly Dictionary<Color, Texture2D> _cache;
+        private static GraphicsDevice _graphicsDevice;
+        private static Dictionary<Color, Texture2D> _cache;
 
-        public ColorManager(GraphicsDevice graphicsDevice)
+        public static void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
             _cache = new Dictionary<Color, Texture2D>();
         }
 
-        public Texture2D Get(Color color)
+        public static Texture2D Get(Color color)
         {
             if (!_cache.ContainsKey(color))
             {

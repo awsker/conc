@@ -1,4 +1,5 @@
 ﻿using conc.game.gui.components;
+using conc.game.input;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,9 +19,9 @@ namespace conc.game.gui
         private readonly Color _defaultColor;
         private readonly Color _highlightColor;
 
-        protected SettingsPanelRow(ColorManager colorManager, SpriteFont font, string title) : base(colorManager)
+        protected SettingsPanelRow(InputManager inputManager, SpriteFont font, string title) : base(inputManager)
         {
-            var titleLabel = new Label(colorManager, font)
+            var titleLabel = new Label(inputManager, font)
             {
                 Text = title,
                 HorizontalAlignment = HorizontalAlignment.Left,

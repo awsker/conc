@@ -107,10 +107,16 @@ namespace conc.game.input
             return _mouseKeys[key] == 0;
         }
 
-        public bool IsMouseDownOverBounds(Rectangle bounds, int playerIndex)
+        public bool IsMouseDownOverBounds(Rectangle bounds)
         {
             var mouseState = Mouse.GetState();
             return bounds.Intersects(mouseState.Position) && IsPressed(MouseKeys.MouseLeft);
+        }
+
+        public bool IsMouseDownOutsideBounds(Rectangle bounds)
+        {
+            var mouseState = Mouse.GetState();
+            return !bounds.Intersects(mouseState.Position) && IsPressed(MouseKeys.MouseLeft);
         }
 
         public Point GetMousePosition()

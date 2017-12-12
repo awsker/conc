@@ -38,8 +38,6 @@ namespace conc.game.scenes
                 new Tuple<string, Command>("Back", new Command(SceneType.Settings))
             });
 
-            var colorManager = _gameManager.Get<ColorManager>();
-
             //var panel = new Panel(colorManager)
             //{
             //    Position = new Vector2(200f, 200f),

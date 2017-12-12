@@ -1,4 +1,5 @@
 ﻿using System;
+using conc.game.input;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +20,7 @@ namespace conc.game.gui.components
         private string _text;
         private Vector2 _textSize;
 
-        public Label(ColorManager colorManager, SpriteFont font) : base(colorManager)
+        public Label(InputManager inputManager, SpriteFont font) : base(inputManager)
         {
             _font = font;
             ForegroundColor = Color.White;

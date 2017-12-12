@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
+using conc.game.commands;
+using conc.game.extensions;
+using conc.game.input;
 using conc.game.util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,6 +11,11 @@ namespace conc.game.gui.components
 {
     public interface IGuiComponent
     {
+        event Action<Command> OnExecuteCommand;
+        event Action OnMouseOver;
+        event Action OnMouseDown; 
+        event Action OnMouseLeave; 
+
         void Update(GameTime gameTime);
         void Draw(SpriteBatch spriteBatch);
 
@@ -35,14 +42,20 @@ namespace conc.game.gui.components
 
     public abstract class GuiComponent : IGuiComponent
     {
+        public event Action<Command> OnExecuteCommand;
+        public event Action OnMouseOver;
+        public event Action OnMouseDown;
+        public event Action OnMouseLeave;
+
         private Vector2 _position;
-        protected readonly ColorManager _colorManager;
         private readonly IList<IGuiComponent> _children;
         private Vector2 _size;
+        protected readonly InputManager _inputManager;
+        private bool _mouseOver;
 
-        protected GuiComponent(ColorManager colorManager)
+        protected GuiComponent(InputManager inputManager)
         {
-            _colorManager = colorManager;
+            _inputManager = inputManager;
             _children = new List<IGuiComponent>();
             Margin = new Margin(0f, 0f, 0f, 0f);
             BackgroundColor = Color.White;
@@ -50,8 +63,38 @@ namespace conc.game.gui.components
             Alpha = 1f;
         }
 
+        protected virtual void MouseOver(Point mousePosition) { }
+        protected virtual void MouseDown(Point mousePosition) { }
+        protected virtual void MouseLeave() { }
+
+        protected void ExecuteCommand(Command command)
+        {
+            OnExecuteCommand?.Invoke(command);
+        }
+
         public virtual void Update(GameTime gameTime)
         {
+            var mousePosition = _inputManager.GetMousePosition();
+
+            if (_mouseOver && !Bounds.Intersects(mousePosition))
+            {
+                _mouseOver = false;
+                MouseLeave();
+                OnMouseLeave?.Invoke();
+            }
+
+            if (Bounds.Intersects(mousePosition))
+            {
+                _mouseOver = true;
+                MouseOver(mousePosition);
+                OnMouseOver?.Invoke();
+                if (_inputManager.IsPressed(MouseKeys.MouseLeft))
+                {
+                    MouseDown(mousePosition);
+                    OnMouseDown?.Invoke();
+                }
+            }
+
             foreach (var child in _children)
                 child.Update(gameTime);
         }
@@ -88,6 +131,7 @@ namespace conc.game.gui.components
         public void AddChild(IGuiComponent child)
         {
             child.Parent = this;
+            child.OnExecuteCommand += ExecuteCommand;
             _children.Add(child);
         }
 

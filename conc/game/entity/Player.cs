@@ -318,6 +318,7 @@ namespace conc.game.entity
                     Velocity = Vector2.Add(Velocity, directionVector * acceleration);
                 }
             }
+
             //Move right
             if (inputManager.IsDown(ControlButtons.MoveRight, _playerNo))
             {
@@ -328,7 +329,7 @@ namespace conc.game.entity
                     Velocity = Vector2.Add(Velocity, directionVector * acceleration);
                 }
             }
-            bool deaccelerate = true; //_onGround;
+
             //Deaccelerate
             if (inputManager.IsDown(ControlButtons.MoveRight, _playerNo) == inputManager.IsDown(ControlButtons.MoveLeft, _playerNo))
             {
